@@ -30,7 +30,13 @@ func (w *Walk) FindComponents() error {
 		return fmt.Errorf("compile regexp to find component connections: %w", err)
 	}
 
-	startWalkHere := w.projectDir + "/" + w.rootNamespace + "/"
+	var startWalkHere string
+
+	if w.projectDir == "" {
+		startWalkHere = w.rootNamespace + "/"
+	} else {
+		startWalkHere = w.projectDir + "/" + w.rootNamespace + "/"
+	}
 
 	return filepath.Walk(startWalkHere, func(path string, info os.FileInfo, err error) error {
 		if err != nil {

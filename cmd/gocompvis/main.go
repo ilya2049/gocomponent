@@ -1,17 +1,18 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"gocomponent/internal/fswalk"
 )
 
-const (
-	projectDir    = ""
-	rootNamespace = "internal"
-)
-
 func main() {
-	walk := fswalk.New(projectDir, rootNamespace)
+	projectDir := flag.String("project-dir", "", "project directory")
+	rootNamespace := flag.String("root-namespace", "internal", "root namespace")
+
+	flag.Parse()
+
+	walk := fswalk.New(*projectDir, *rootNamespace)
 	if err := walk.FindComponents(); err != nil {
 		fmt.Println(err)
 

@@ -3,7 +3,7 @@
 ## Визуализация компонентов
 
 ``` sh
-gocompvis > components.dot
+gocompvis -project-dir=/project/dir -root-namespace=internal > components.dot
 
-dot -Tsvg -o components.dot
+dot -Tsvg -O components.dot
 ```
