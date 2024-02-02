@@ -18,5 +18,5 @@ func main() {
 		return
 	}
 
-	walk.PrintComponentsAndItsConnections()
+	walk.PrintDotGraph()
 }

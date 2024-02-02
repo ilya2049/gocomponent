@@ -72,7 +72,9 @@ func (w *Walk) noteNewComponentConnection(component, componentConnection string)
 	w.componentsAndTheirConnections[component][componentConnection] = struct{}{}
 }
 
-func (w *Walk) PrintComponentsAndItsConnections() {
+func (w *Walk) PrintDotGraph() {
+	fmt.Println("digraph G {")
+
 	for component, connections := range w.componentsAndTheirConnections {
 		fmt.Println(component)
 
@@ -82,4 +84,6 @@ func (w *Walk) PrintComponentsAndItsConnections() {
 			}
 		}
 	}
+
+	fmt.Println("}")
 }
