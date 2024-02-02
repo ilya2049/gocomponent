@@ -7,7 +7,7 @@ import (
 
 const (
 	projectDir    = ""
-	rootNamespace = "internal/"
+	rootNamespace = "internal"
 )
 
 func main() {
@@ -18,5 +18,5 @@ func main() {
 		return
 	}
 
-	walk.PrintComponents()
+	walk.PrintComponentsAndItsConnections()
 }

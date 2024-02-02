@@ -7,36 +7,50 @@ import (
 	"regexp"
 )
 
-var (
-	// '/internal/app/commands/user/create.go' -> 'user'
-	componentRegexp = regexp.MustCompile(`.*\/(.*)\/.*\.go`)
-)
-
 type Walk struct {
 	projectDir                    string
 	rootNamespace                 string
-	componentsAndTheirConnections map[string][]string
+	componentsAndTheirConnections map[string]map[string]struct{}
 }
 
 func New(projectDir string, rootNamespace string) *Walk {
 	return &Walk{
 		projectDir:                    projectDir,
 		rootNamespace:                 rootNamespace,
-		componentsAndTheirConnections: map[string][]string{},
+		componentsAndTheirConnections: map[string]map[string]struct{}{},
 	}
 }
 
 func (w *Walk) FindComponents() error {
-	return filepath.Walk(w.projectDir+"/"+w.rootNamespace, func(path string, info os.FileInfo, err error) error {
+	componentConnectionRegexp, err := regexp.Compile(
+		fmt.Sprintf(componentConnectionRegexpTemplate, w.rootNamespace),
+	)
+
+	if err != nil {
+		return fmt.Errorf("compile regexp to find component connections: %w", err)
+	}
+
+	startWalkHere := w.projectDir + "/" + w.rootNamespace + "/"
+
+	return filepath.Walk(startWalkHere, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 
 		if isGoSourceFile(path) {
-			regexpMatches := componentRegexp.FindStringSubmatch(path)
+			if component := getComponentUsingRegexp(path); component != "" {
+				w.noteNewComponent(component)
 
-			if len(regexpMatches) == 2 {
-				w.componentsAndTheirConnections[regexpMatches[1]] = []string{}
+				goFileContents, err := readFile(path)
+				if err != nil {
+					return err
+				}
+
+				for _, componentConnection := range getComponentConnectionsUsingRegexp(
+					componentConnectionRegexp, goFileContents,
+				) {
+					w.noteNewComponentConnection(component, componentConnection)
+				}
 			}
 		}
 
@@ -44,22 +58,28 @@ func (w *Walk) FindComponents() error {
 	})
 }
 
-func (w *Walk) FindComponentConnections() error {
-	return filepath.Walk(w.projectDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if isGoSourceFile(path) {
-
-		}
-
-		return nil
-	})
+func (w *Walk) noteNewComponent(component string) {
+	if _, ok := w.componentsAndTheirConnections[component]; !ok {
+		w.componentsAndTheirConnections[component] = map[string]struct{}{}
+	}
 }
 
-func (w *Walk) PrintComponents() {
-	for component := range w.componentsAndTheirConnections {
+func (w *Walk) noteNewComponentConnection(component, componentConnection string) {
+	if component == componentConnection {
+		return
+	}
+
+	w.componentsAndTheirConnections[component][componentConnection] = struct{}{}
+}
+
+func (w *Walk) PrintComponentsAndItsConnections() {
+	for component, connections := range w.componentsAndTheirConnections {
 		fmt.Println(component)
+
+		if len(connections) > 0 {
+			for connection := range connections {
+				fmt.Println(component, "->", connection)
+			}
+		}
 	}
 }
