@@ -3,7 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"gocomponent/internal/fswalk"
+
+	"github.com/ilya2049/gocomponent/internal/fswalk"
 )
 
 func main() {

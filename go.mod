@@ -1,3 +1,3 @@
-module gocomponent
+module github.com/ilya2049/gocomponent
 
-go 1.21.4
+go 1.21
