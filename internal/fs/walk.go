@@ -9,25 +9,20 @@ import (
 )
 
 type Walk struct {
-	projectDir                    string
-	rootNamespace                 string
-	componentsAndTheirConnections map[string]map[string]struct{}
+	projectDir           string
+	rootNamespace        string
+	componentsAndImports map[string]map[string]struct{}
 }
 
 func New(projectDir string, rootNamespace string) *Walk {
 	return &Walk{
-		projectDir:                    projectDir,
-		rootNamespace:                 rootNamespace,
-		componentsAndTheirConnections: map[string]map[string]struct{}{},
+		projectDir:           projectDir,
+		rootNamespace:        rootNamespace,
+		componentsAndImports: map[string]map[string]struct{}{},
 	}
 }
 
-func (w *Walk) FindComponents() error {
-	componentImportRegexp, err := regexp.CompileComponentImportRegexp(w.rootNamespace)
-	if err != nil {
-		return fmt.Errorf("compile component import regexp: %w", err)
-	}
-
+func (w *Walk) startWalkHere() string {
 	var startWalkHere string
 
 	if w.projectDir == "" {
@@ -36,24 +31,33 @@ func (w *Walk) FindComponents() error {
 		startWalkHere = w.projectDir + "/" + w.rootNamespace + "/"
 	}
 
-	return filepath.Walk(startWalkHere, func(path string, info os.FileInfo, err error) error {
+	return startWalkHere
+}
+
+func (w *Walk) FindComponentsAndImports() error {
+	componentImportRegexp, err := regexp.CompileComponentImportRegexp(w.rootNamespace)
+	if err != nil {
+		return fmt.Errorf("compile component import regexp: %w", err)
+	}
+
+	return filepath.Walk(w.startWalkHere(), func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return err
+			return fmt.Errorf("walk err: %w", err)
 		}
 
 		if isGoSourceFile(path) {
 			if component := regexp.FindComponent(path); component != "" {
-				w.noteNewComponent(component)
+				w.saveComponentWithoutImport(component)
 
 				goFileContents, err := readFile(path)
 				if err != nil {
-					return err
+					return fmt.Errorf("read .go file: %w", err)
 				}
 
-				for _, componentConnection := range regexp.FindComponentImports(
-					componentImportRegexp, goFileContents,
-				) {
-					w.noteNewComponentConnection(component, componentConnection)
+				componentImports := regexp.FindComponentImports(componentImportRegexp, goFileContents)
+
+				for _, componentImport := range componentImports {
+					w.saveComponentImport(component, componentImport)
 				}
 			}
 		}
@@ -62,29 +66,29 @@ func (w *Walk) FindComponents() error {
 	})
 }
 
-func (w *Walk) noteNewComponent(component string) {
-	if _, ok := w.componentsAndTheirConnections[component]; !ok {
-		w.componentsAndTheirConnections[component] = map[string]struct{}{}
+func (w *Walk) saveComponentWithoutImport(component string) {
+	if _, ok := w.componentsAndImports[component]; !ok {
+		w.componentsAndImports[component] = map[string]struct{}{}
 	}
 }
 
-func (w *Walk) noteNewComponentConnection(component, componentConnection string) {
-	if component == componentConnection {
+func (w *Walk) saveComponentImport(component, componentImport string) {
+	if component == componentImport {
 		return
 	}
 
-	w.componentsAndTheirConnections[component][componentConnection] = struct{}{}
+	w.componentsAndImports[component][componentImport] = struct{}{}
 }
 
 func (w *Walk) PrintDotGraph() {
 	fmt.Println("digraph G {")
 
-	for component, connections := range w.componentsAndTheirConnections {
+	for component, componentImports := range w.componentsAndImports {
 		fmt.Println(component)
 
-		if len(connections) > 0 {
-			for connection := range connections {
-				fmt.Println(component, "->", connection)
+		if len(componentImports) > 0 {
+			for componentImport := range componentImports {
+				fmt.Println(component, "->", componentImport)
 			}
 		}
 	}

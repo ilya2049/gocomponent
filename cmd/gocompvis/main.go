@@ -14,7 +14,7 @@ func main() {
 	flag.Parse()
 
 	walk := fs.New(*projectDir, *rootNamespace)
-	if err := walk.FindComponents(); err != nil {
+	if err := walk.FindComponentsAndImports(); err != nil {
 		fmt.Println(err)
 
 		return

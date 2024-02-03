@@ -13,7 +13,7 @@ func isGoSourceFile(path string) bool {
 func readFile(path string) (string, error) {
 	contents, err := os.ReadFile(path)
 	if err != nil {
-		return "", fmt.Errorf("read .go file: %w", err)
+		return "", fmt.Errorf("read: %w", err)
 	}
 
 	return string(contents), nil
