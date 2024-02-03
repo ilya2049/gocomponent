@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/ilya2049/gocomponent/internal/fswalk"
+	"github.com/ilya2049/gocomponent/internal/fs"
 )
 
 func main() {
@@ -13,7 +13,7 @@ func main() {
 
 	flag.Parse()
 
-	walk := fswalk.New(*projectDir, *rootNamespace)
+	walk := fs.New(*projectDir, *rootNamespace)
 	if err := walk.FindComponents(); err != nil {
 		fmt.Println(err)
 

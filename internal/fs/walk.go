@@ -1,4 +1,4 @@
-package fswalk
+package fs
 
 import (
 	"fmt"
