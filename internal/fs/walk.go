@@ -4,21 +4,24 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/ilya2049/gocomponent/internal/regexp"
 )
 
 type Walk struct {
-	projectDir           string
-	rootNamespace        string
-	componentsAndImports map[string]map[string]struct{}
+	projectDir              string
+	rootNamespace           string
+	componentsAndImports    map[string]map[string]struct{}
+	componentsAndNameSpaces map[string]map[string]struct{}
 }
 
 func New(projectDir string, rootNamespace string) *Walk {
 	return &Walk{
-		projectDir:           projectDir,
-		rootNamespace:        rootNamespace,
-		componentsAndImports: map[string]map[string]struct{}{},
+		projectDir:              projectDir,
+		rootNamespace:           rootNamespace,
+		componentsAndImports:    map[string]map[string]struct{}{},
+		componentsAndNameSpaces: map[string]map[string]struct{}{},
 	}
 }
 
@@ -80,18 +83,22 @@ func (w *Walk) saveComponentImport(component, componentImport string) {
 	w.componentsAndImports[component][componentImport] = struct{}{}
 }
 
-func (w *Walk) PrintDotGraph() {
-	fmt.Println("digraph G {")
+func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph() string {
+	sb := strings.Builder{}
+
+	sb.WriteString("digraph G {\n")
 
 	for component, componentImports := range w.componentsAndImports {
-		fmt.Println(component)
+		sb.WriteString(component + "\n")
 
 		if len(componentImports) > 0 {
 			for componentImport := range componentImports {
-				fmt.Println(component, "->", componentImport)
+				sb.WriteString(component + " -> " + componentImport + "\n")
 			}
 		}
 	}
 
-	fmt.Println("}")
+	sb.WriteString("}")
+
+	return sb.String()
 }

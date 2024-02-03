@@ -20,5 +20,7 @@ func main() {
 		return
 	}
 
-	walk.PrintDotGraph()
+	dotGraph := walk.ConvertComponentsAndImportsToDotGraphDotGraph()
+
+	fmt.Println(dotGraph)
 }
