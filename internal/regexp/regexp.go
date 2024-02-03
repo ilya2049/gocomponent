@@ -7,22 +7,41 @@ import (
 
 const (
 	/*
-		import quser "exampleproject/internal/app/queries/user" -> user
+		import "exampleproject/internal/app/queries/user" -> user
 		%s is 'internal'
 	*/
-	componentImportRegexpTpl = `".*%s.*\/(.*)"`
+	singleNameComponentImportRegexpTpl = `".*%s.*\/(.*)"`
+
+	/*
+		import "exampleproject/internal/app/queries/user/admin" -> user/admin
+		%s is 'internal'
+	*/
+	doubleNameComponentImportRegexpTpl = `".*%s.*\/(.*\/.*)"`
 )
 
 var (
 	/*
 		/internal/app/commands/user/create.go -> user
 	*/
-	componentRegexp = regexp.MustCompile(`.*\/(.*)\/.*\.go`)
+	singleNameComponentRegexp = regexp.MustCompile(`.*\/(.*)\/.*\.go`)
+
+	/*
+		/internal/app/commands/user/admin/create.go -> user/admin
+	*/
+	doubleNameComponentRegexp = regexp.MustCompile(`.*\/(.*\/.*)\/.*\.go`)
 )
 
-func CompileComponentImportRegexp(rootNamespace string) (*regexp.Regexp, error) {
+func CompileComponentImportRegexp(rootNamespace string, isDoubleName bool) (*regexp.Regexp, error) {
+	var regexpTpl string
+
+	if isDoubleName {
+		regexpTpl = doubleNameComponentImportRegexpTpl
+	} else {
+		regexpTpl = singleNameComponentImportRegexpTpl
+	}
+
 	r, err := regexp.Compile(
-		fmt.Sprintf(componentImportRegexpTpl, rootNamespace),
+		fmt.Sprintf(regexpTpl, rootNamespace),
 	)
 
 	if err != nil {
@@ -32,8 +51,14 @@ func CompileComponentImportRegexp(rootNamespace string) (*regexp.Regexp, error) 
 	return r, nil
 }
 
-func FindComponent(path string) string {
-	matches := componentRegexp.FindStringSubmatch(path)
+func FindComponent(path string, isDoubleName bool) string {
+	var matches []string
+
+	if isDoubleName {
+		matches = doubleNameComponentRegexp.FindStringSubmatch(path)
+	} else {
+		matches = singleNameComponentRegexp.FindStringSubmatch(path)
+	}
 
 	if len(matches) == 2 {
 		return matches[1]

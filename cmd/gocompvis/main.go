@@ -8,12 +8,17 @@ import (
 )
 
 func main() {
-	projectDir := flag.String("project-dir", "", "project directory")
-	rootNamespace := flag.String("root-namespace", "internal", "root namespace")
+	projectDir := flag.String("dir", "", "project directory")
+	rootNamespace := flag.String("root", "internal", "root namespace")
+	componentsHaveDoubleName := flag.Bool("double", false, "components have double name")
 
 	flag.Parse()
 
-	walk := fs.New(*projectDir, *rootNamespace)
+	walk := fs.NewWalk(*projectDir, *rootNamespace)
+	if *componentsHaveDoubleName {
+		walk.ComponentsHaveDoubleName()
+	}
+
 	if err := walk.FindComponentsAndImports(); err != nil {
 		fmt.Println(err)
 

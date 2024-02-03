@@ -10,17 +10,22 @@ import (
 )
 
 type Walk struct {
-	projectDir           string
-	rootNamespace        string
-	componentsAndImports map[string]map[string]struct{}
+	projectDir                 string
+	rootNamespace              string
+	componentsAndImports       map[string]map[string]struct{}
+	isComponentsHaveDoubleName bool
 }
 
-func New(projectDir string, rootNamespace string) *Walk {
+func NewWalk(projectDir string, rootNamespace string) *Walk {
 	return &Walk{
 		projectDir:           projectDir,
 		rootNamespace:        rootNamespace,
 		componentsAndImports: map[string]map[string]struct{}{},
 	}
+}
+
+func (w *Walk) ComponentsHaveDoubleName() {
+	w.isComponentsHaveDoubleName = true
 }
 
 func (w *Walk) startWalkHere() string {
@@ -36,7 +41,7 @@ func (w *Walk) startWalkHere() string {
 }
 
 func (w *Walk) FindComponentsAndImports() error {
-	componentImportRegexp, err := regexp.CompileComponentImportRegexp(w.rootNamespace)
+	componentImportRegexp, err := regexp.CompileComponentImportRegexp(w.rootNamespace, w.isComponentsHaveDoubleName)
 	if err != nil {
 		return fmt.Errorf("compile component import regexp: %w", err)
 	}
@@ -47,7 +52,7 @@ func (w *Walk) FindComponentsAndImports() error {
 		}
 
 		if isGoSourceFile(path) {
-			if component := regexp.FindComponent(path); component != "" {
+			if component := regexp.FindComponent(path, w.isComponentsHaveDoubleName); component != "" {
 				w.saveComponentWithoutImport(component)
 
 				goFileContents, err := readFile(path)
@@ -87,11 +92,11 @@ func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph() string {
 	sb.WriteString("digraph G {\n")
 
 	for component, componentImports := range w.componentsAndImports {
-		sb.WriteString(component + "\n")
+		sb.WriteString(`"` + component + `"` + "\n")
 
 		if len(componentImports) > 0 {
 			for componentImport := range componentImports {
-				sb.WriteString(component + " -> " + componentImport + "\n")
+				sb.WriteString(`"` + component + `" -> "` + componentImport + `"` + "\n")
 			}
 		}
 	}
