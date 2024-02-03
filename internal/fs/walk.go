@@ -10,18 +10,16 @@ import (
 )
 
 type Walk struct {
-	projectDir              string
-	rootNamespace           string
-	componentsAndImports    map[string]map[string]struct{}
-	componentsAndNameSpaces map[string]map[string]struct{}
+	projectDir           string
+	rootNamespace        string
+	componentsAndImports map[string]map[string]struct{}
 }
 
 func New(projectDir string, rootNamespace string) *Walk {
 	return &Walk{
-		projectDir:              projectDir,
-		rootNamespace:           rootNamespace,
-		componentsAndImports:    map[string]map[string]struct{}{},
-		componentsAndNameSpaces: map[string]map[string]struct{}{},
+		projectDir:           projectDir,
+		rootNamespace:        rootNamespace,
+		componentsAndImports: map[string]map[string]struct{}{},
 	}
 }
 
