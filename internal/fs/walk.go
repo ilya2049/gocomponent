@@ -28,25 +28,13 @@ func (w *Walk) ComponentsHaveDoubleName() {
 	w.isComponentsHaveDoubleName = true
 }
 
-func (w *Walk) startWalkHere() string {
-	var startWalkHere string
-
-	if w.projectDir == "" {
-		startWalkHere = "./"
-	} else {
-		startWalkHere = w.projectDir + "/"
-	}
-
-	return startWalkHere
-}
-
 func (w *Walk) FindComponentsAndImports() error {
 	componentImportRegexp, err := regexp.CompileComponentImportRegexp(w.rootNamespace, w.isComponentsHaveDoubleName)
 	if err != nil {
 		return fmt.Errorf("compile component import regexp: %w", err)
 	}
 
-	return filepath.Walk(w.startWalkHere(), func(path string, info os.FileInfo, err error) error {
+	return filepath.Walk(w.projectDir+"/", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return fmt.Errorf("walk err: %w", err)
 		}

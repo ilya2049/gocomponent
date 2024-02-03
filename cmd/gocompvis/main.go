@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	projectDir := flag.String("dir", "", "project directory")
+	projectDir := flag.String("dir", "./", "project directory")
 	rootNamespace := flag.String("root", "internal", "root namespace")
 	componentsHaveDoubleName := flag.Bool("double", false, "components have double name")
 
