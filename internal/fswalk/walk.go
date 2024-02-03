@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
+
+	"github.com/ilya2049/gocomponent/internal/regexp"
 )
 
 type Walk struct {
@@ -22,12 +23,9 @@ func New(projectDir string, rootNamespace string) *Walk {
 }
 
 func (w *Walk) FindComponents() error {
-	componentConnectionRegexp, err := regexp.Compile(
-		fmt.Sprintf(componentConnectionRegexpTemplate, w.rootNamespace),
-	)
-
+	componentImportRegexp, err := regexp.CompileComponentImportRegexp(w.rootNamespace)
 	if err != nil {
-		return fmt.Errorf("compile regexp to find component connections: %w", err)
+		return fmt.Errorf("compile component import regexp: %w", err)
 	}
 
 	var startWalkHere string
@@ -44,7 +42,7 @@ func (w *Walk) FindComponents() error {
 		}
 
 		if isGoSourceFile(path) {
-			if component := getComponentUsingRegexp(path); component != "" {
+			if component := regexp.FindComponent(path); component != "" {
 				w.noteNewComponent(component)
 
 				goFileContents, err := readFile(path)
@@ -52,8 +50,8 @@ func (w *Walk) FindComponents() error {
 					return err
 				}
 
-				for _, componentConnection := range getComponentConnectionsUsingRegexp(
-					componentConnectionRegexp, goFileContents,
+				for _, componentConnection := range regexp.FindComponentImports(
+					componentImportRegexp, goFileContents,
 				) {
 					w.noteNewComponentConnection(component, componentConnection)
 				}
