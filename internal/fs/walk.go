@@ -29,9 +29,9 @@ func (w *Walk) startWalkHere() string {
 	var startWalkHere string
 
 	if w.projectDir == "" {
-		startWalkHere = w.rootNamespace + "/"
+		startWalkHere = "./"
 	} else {
-		startWalkHere = w.projectDir + "/" + w.rootNamespace + "/"
+		startWalkHere = w.projectDir + "/"
 	}
 
 	return startWalkHere
