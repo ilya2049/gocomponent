@@ -8,91 +8,91 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestID_Namespace(t *testing.T) {
+func TestNamespace_ExcludeLastSection(t *testing.T) {
 	tests := []struct {
 		name string
-		id   component.ID
+		id   component.Namespace
 		want string
 	}{
 		{
-			name: "The last part of id is a component name, the rest is a namespace",
+			name: "The last section is not empty",
 			id:   "/internal/postgresql/connection",
 			want: "/internal/postgresql/",
 		},
 		{
-			name: "Id is a empty string",
+			name: "Namespace is a empty string",
 			id:   "",
 			want: "",
 		},
 		{
-			name: "Id has no a namespace",
+			name: "Namespace has only one section",
 			id:   "connection",
 			want: "",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, tt.id.Namespace())
+			assert.Equal(t, tt.want, tt.id.ExcludeLastSection())
 		})
 	}
 }
 
-func TestID_ComponentName(t *testing.T) {
+func TestNamespace_LastSection(t *testing.T) {
 	tests := []struct {
 		name string
-		id   component.ID
+		id   component.Namespace
 		want string
 	}{
 		{
-			name: "A component name is the last part of id",
+			name: "The last section is not empty",
 			id:   "/internal/postgresql/connection",
 			want: "connection",
 		},
 		{
-			name: "Id is a empty string",
+			name: "Namespace is a empty string",
 			id:   "",
 			want: "",
 		},
 		{
-			name: "Id has no a namespace",
+			name: "Namespace has only one section",
 			id:   "connection",
 			want: "connection",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, tt.id.ComponentName())
+			assert.Equal(t, tt.want, tt.id.LastSection())
 		})
 	}
 }
 
-func TestID_ExtendShortID(t *testing.T) {
+func TestNamespace_ExtendComponentID(t *testing.T) {
 	tests := []struct {
 		name    string
-		id      component.ID
+		id      component.Namespace
 		shortID string
 		want    string
 	}{
 		{
-			name:    "A short id is empty",
+			name:    "There are not sections in a component id yet",
 			id:      "/internal/postgresql/connection",
 			shortID: "",
 			want:    "connection",
 		},
 		{
-			name:    "A short id is a component name",
+			name:    "There is only one section in a component id",
 			id:      "/internal/postgresql/connection",
 			shortID: "connection",
 			want:    "postgresql/connection",
 		},
 		{
-			name:    "A short id has already extended",
+			name:    "There are two sections in a component id",
 			id:      "/internal/postgresql/connection",
 			shortID: "postgresql/connection",
 			want:    "internal/postgresql/connection",
 		},
 		{
-			name:    "A short id cannot be extended",
+			name:    "A component id cannot be extended",
 			id:      "/internal/postgresql/connection",
 			shortID: "internal/postgresql/connection",
 			want:    "internal/postgresql/connection",
@@ -100,7 +100,7 @@ func TestID_ExtendShortID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, tt.id.ExtendShortID(tt.shortID))
+			assert.Equal(t, tt.want, tt.id.ExtendComponentID(tt.shortID))
 		})
 	}
 }
