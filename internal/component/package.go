@@ -7,18 +7,15 @@ import (
 )
 
 type Package struct {
-	Component
+	*Component
 
 	imports map[string]struct{}
 }
 
-func NewPackage(id Namespace) *Package {
+func NewPackage(c *Component) *Package {
 	return &Package{
-		Component: Component{
-			namespace: id,
-			id:        "",
-		},
-		imports: make(map[string]struct{}),
+		Component: c,
+		imports:   make(map[string]struct{}),
 	}
 }
 

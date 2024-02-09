@@ -9,15 +9,10 @@ import (
 
 func main() {
 	projectDir := flag.String("dir", "./", "project directory")
-	rootNamespace := flag.String("root", "internal", "root namespace")
-	componentsHaveDoubleName := flag.Bool("double", false, "components have double name")
 
 	flag.Parse()
 
-	walk := fs.NewWalk(*projectDir, *rootNamespace)
-	if *componentsHaveDoubleName {
-		walk.ComponentsHaveDoubleName()
-	}
+	walk := fs.NewWalk(*projectDir)
 
 	if err := walk.FindComponentsAndImports(); err != nil {
 		fmt.Println(err)
@@ -25,7 +20,7 @@ func main() {
 		return
 	}
 
-	dotGraph := walk.ConvertComponentsAndImportsToDotGraphDotGraph()
+	graph := walk.ConvertComponentsAndImportsToDotGraphDotGraph()
 
-	fmt.Println(dotGraph)
+	fmt.Println(graph)
 }

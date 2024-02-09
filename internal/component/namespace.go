@@ -31,7 +31,7 @@ func (ns Namespace) LastSection() string {
 }
 
 func (ns Namespace) ExtendComponentID(sections string) string {
-	if string(ns) == SectionSeparator+sections {
+	if string(ns) == sections {
 		return sections
 	}
 

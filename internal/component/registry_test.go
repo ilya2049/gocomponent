@@ -11,10 +11,10 @@ import (
 func TestRegistry_MakeUniqueComponentIDs(t *testing.T) {
 	registry := component.NewRegistry()
 
-	_ = registry.GetOrAddComponent(component.NewNamespace("/postgresql/repository/user/edit"))
-	_ = registry.GetOrAddComponent(component.NewNamespace("/domain/user/edit"))
-	_ = registry.GetOrAddComponent(component.NewNamespace("/domain/product/edit"))
-	_ = registry.GetOrAddComponent(component.NewNamespace("/pkg"))
+	_ = registry.GetOrAddComponent(component.NewNamespace("postgresql/repository/user/edit"))
+	_ = registry.GetOrAddComponent(component.NewNamespace("domain/user/edit"))
+	_ = registry.GetOrAddComponent(component.NewNamespace("domain/product/edit"))
+	_ = registry.GetOrAddComponent(component.NewNamespace("pkg"))
 
 	registry.MakeUniqueComponentIDs()
 
