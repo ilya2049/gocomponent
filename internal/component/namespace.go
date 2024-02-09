@@ -6,6 +6,10 @@ const SectionSeparator = "/"
 
 type Namespace string
 
+func NewNamespace(value string) Namespace {
+	return Namespace(value)
+}
+
 func (ns Namespace) ExcludeLastSection() string {
 	sections := strings.Split(string(ns), SectionSeparator)
 
