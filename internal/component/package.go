@@ -9,35 +9,45 @@ import (
 type Package struct {
 	*Component
 
-	imports map[string]struct{}
+	imports map[Namespace]*Component
 }
 
 func NewPackage(c *Component) *Package {
 	return &Package{
 		Component: c,
-		imports:   make(map[string]struct{}),
+		imports:   make(map[Namespace]*Component),
 	}
 }
 
-func (p *Package) ParseImportsOfGoFile(goFileName string) error {
+func (p *Package) ParseImportsOfGoFile(goFileName string, componentRegistry *Registry) error {
 	file, err := parser.ParseFile(token.NewFileSet(), goFileName, nil, parser.Mode(0))
 	if err != nil {
 		return fmt.Errorf("parse file: %w", err)
 	}
 
 	for _, imp := range file.Imports {
-		p.imports[imp.Path.Value] = struct{}{}
+		namespace := NewNamespace(imp.Path.Value[1 : len(imp.Path.Value)-1])
+
+		c := componentRegistry.GetOrAddComponent(namespace)
+
+		p.imports[namespace] = c
 	}
 
 	return nil
 }
 
-func (p *Package) Join(another *Package) {
-	if !another.namespace.Contains(p.namespace) {
-		return
+func (p *Package) Join(anotherPackage *Package) {
+	for namespace, component := range anotherPackage.imports {
+		p.imports[namespace] = component
+	}
+}
+
+func (p *Package) Imports() []*Component {
+	var components []*Component
+
+	for _, c := range p.imports {
+		components = append(components, c)
 	}
 
-	for imp := range another.imports {
-		p.imports[imp] = struct{}{}
-	}
+	return components
 }

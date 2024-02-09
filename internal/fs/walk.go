@@ -34,8 +34,9 @@ func (w *Walk) FindComponentsAndImports() error {
 			if ok {
 				c := w.componentRegistry.GetOrAddComponent(namespace)
 				p := component.NewPackage(c)
+				p.ParseImportsOfGoFile(path, w.componentRegistry)
 
-				w.packages[namespace] = p
+				w.addPackage(namespace, p)
 			}
 		}
 
@@ -51,12 +52,31 @@ func (w *Walk) FindComponentsAndImports() error {
 	return nil
 }
 
+func (w *Walk) addPackage(namespace component.Namespace, newPackage *component.Package) {
+	existingPackage, ok := w.packages[namespace]
+	if ok {
+		existingPackage.Join(newPackage)
+
+		return
+	}
+
+	w.packages[namespace] = newPackage
+}
+
 func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph() string {
 	sb := strings.Builder{}
 
+	sb.WriteString("graph {\n")
+
 	for _, p := range w.packages {
-		sb.WriteString(p.ID() + "\n")
+		sb.WriteString(`"` + p.ID() + `"` + "\n")
+
+		for _, importedComponent := range p.Imports() {
+			sb.WriteString(`"` + p.ID() + `" -> "` + importedComponent.ID() + `"` + "\n")
+		}
 	}
+
+	sb.WriteString("}")
 
 	return sb.String()
 }
