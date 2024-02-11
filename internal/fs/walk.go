@@ -24,21 +24,30 @@ func NewWalk(projectDir string) *Walk {
 }
 
 func (w *Walk) FindComponentsAndImports() error {
-	err := filepath.Walk(w.projectDir+"/", func(path string, info os.FileInfo, err error) error {
+	moduleName, err := readModuleName()
+	if err != nil {
+		return err
+	}
+
+	err = filepath.Walk(w.projectDir+"/", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return fmt.Errorf("walk err: %w", err)
 		}
 
-		if isGoSourceFile(path) {
-			namespace, ok := findNamespaceInPath(path)
-			if ok {
-				c := w.componentRegistry.GetOrAddComponent(namespace)
-				p := component.NewPackage(c)
-				p.ParseImportsOfGoFile(path, w.componentRegistry)
-
-				w.addPackage(namespace, p)
-			}
+		if !isGoSourceFile(path) {
+			return nil
 		}
+
+		namespace, ok := findNamespaceInPath(path)
+		if !ok {
+			return nil
+		}
+
+		c := w.componentRegistry.GetOrAddComponent(namespace)
+		p := component.NewPackage(c)
+		p.ParseImportsOfGoFile(moduleName, path, w.componentRegistry)
+
+		w.addPackage(namespace, p)
 
 		return nil
 	})
@@ -69,14 +78,10 @@ func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph() string {
 	sb.WriteString("digraph {\n")
 
 	for _, p := range w.packages {
-		imports := p.Imports()
+		sb.WriteString(`"` + p.ID() + `"` + "\n")
 
-		if len(imports) == 0 {
-			sb.WriteString(`"` + p.ID() + `"` + "\n")
-		} else {
-			for _, importedComponent := range p.Imports() {
-				sb.WriteString(`"` + p.ID() + `" -> "` + importedComponent.ID() + `"` + "\n")
-			}
+		for _, importedComponent := range p.Imports() {
+			sb.WriteString(`"` + p.ID() + `" -> "` + importedComponent.ID() + `"` + "\n")
 		}
 	}
 

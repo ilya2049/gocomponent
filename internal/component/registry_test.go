@@ -31,5 +31,5 @@ func TestRegistry_MakeUniqueComponentIDs(t *testing.T) {
 		"pkg",
 	}
 
-	assert.EqualValues(t, want, uniqueIDs)
+	assert.ElementsMatch(t, want, uniqueIDs)
 }

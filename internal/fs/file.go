@@ -1,6 +1,9 @@
 package fs
 
 import (
+	"errors"
+	"fmt"
+	"os"
 	"regexp"
 	"strings"
 
@@ -21,4 +24,32 @@ func findNamespaceInPath(path string) (component.Namespace, bool) {
 
 func isGoSourceFile(path string) bool {
 	return strings.Contains(path, ".go")
+}
+
+var ErrFirstLineOfGoModShouldIncludeExactlyTwoPArts = errors.New(
+	"the first line of go mod file parts should includes exactly two parts",
+)
+
+func readModuleName() (string, error) {
+	goModFileContents, err := os.ReadFile("go.mod")
+	if err != nil {
+		return "", fmt.Errorf("read go.mod: %w", err)
+	}
+
+	var firstLineOfGoModFile = []byte{}
+
+	for _, b := range goModFileContents {
+		if b == '\n' {
+			break
+		} else {
+			firstLineOfGoModFile = append(firstLineOfGoModFile, b)
+		}
+	}
+
+	firstLineOfGoModFileParts := strings.Split(string(firstLineOfGoModFile), " ")
+	if len(firstLineOfGoModFileParts) != 2 {
+		return "", ErrFirstLineOfGoModShouldIncludeExactlyTwoPArts
+	}
+
+	return firstLineOfGoModFileParts[1], nil
 }

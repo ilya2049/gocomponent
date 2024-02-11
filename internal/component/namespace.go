@@ -44,6 +44,10 @@ func (ns Namespace) ExtendComponentID(sections string) string {
 	return extendedSections
 }
 
-func (id Namespace) Contains(another Namespace) bool {
-	return !strings.Contains(string(id), string(another))
+func (ns Namespace) Contains(another Namespace) bool {
+	return !strings.Contains(string(ns), string(another))
+}
+
+func (ns Namespace) TrimPrefix(prefix string) Namespace {
+	return Namespace(strings.TrimPrefix(string(ns), prefix))
 }

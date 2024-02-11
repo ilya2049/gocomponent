@@ -19,7 +19,11 @@ func NewPackage(c *Component) *Package {
 	}
 }
 
-func (p *Package) ParseImportsOfGoFile(goFileName string, componentRegistry *Registry) error {
+func (p *Package) ParseImportsOfGoFile(
+	moduleName string,
+	goFileName string,
+	componentRegistry *Registry,
+) error {
 	file, err := parser.ParseFile(token.NewFileSet(), goFileName, nil, parser.Mode(0))
 	if err != nil {
 		return fmt.Errorf("parse file: %w", err)
@@ -27,6 +31,12 @@ func (p *Package) ParseImportsOfGoFile(goFileName string, componentRegistry *Reg
 
 	for _, imp := range file.Imports {
 		namespace := NewNamespace(imp.Path.Value[1 : len(imp.Path.Value)-1])
+
+		namespace = namespace.TrimPrefix(moduleName + "/")
+
+		if namespace == p.namespace {
+			continue
+		}
 
 		c := componentRegistry.GetOrAddComponent(namespace)
 
