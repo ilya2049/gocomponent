@@ -1,19 +1,31 @@
 package main
 
 import (
-	"flag"
 	"fmt"
+	"os"
 
+	"github.com/BurntSushi/toml"
+
+	"github.com/ilya2049/gocomponent/internal/config"
 	"github.com/ilya2049/gocomponent/internal/fs"
 )
 
 func main() {
-	projectDir := flag.String("dir", "./", "project directory")
-	filterInProjectComponents := flag.Bool("in-project", false, "filter the 'in project' components")
+	configContents, err := os.ReadFile("config.toml")
+	if err != nil {
+		fmt.Printf("read config: %s\n", err.Error())
 
-	flag.Parse()
+		return
+	}
 
-	walk := fs.NewWalk(*projectDir)
+	var conf config.Config
+	if _, err := toml.Decode(string(configContents), &conf); err != nil {
+		fmt.Printf("decode config: %s\n", err.Error())
+
+		return
+	}
+
+	walk := fs.NewWalk(conf.ProjectDirectory)
 
 	if err := walk.FindComponentsAndImports(); err != nil {
 		fmt.Println(err)
@@ -21,7 +33,7 @@ func main() {
 		return
 	}
 
-	graph := walk.ConvertComponentsAndImportsToDotGraphDotGraph(*filterInProjectComponents)
+	graph := walk.ConvertComponentsAndImportsToDotGraphDotGraph(conf.ShowThirdPartyImports)
 
 	fmt.Println(graph)
 }

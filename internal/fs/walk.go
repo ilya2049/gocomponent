@@ -76,7 +76,7 @@ func (w *Walk) addPackage(namespace component.Namespace, newPackage *component.P
 	w.packages[namespace] = newPackage
 }
 
-func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph(filterInProjectComponents bool) string {
+func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph(showThirdPartyImports bool) string {
 	sb := strings.Builder{}
 
 	sb.WriteString("digraph {\n")
@@ -86,12 +86,12 @@ func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph(filterInProjectComp
 
 		for _, importedComponent := range p.Imports() {
 
-			if filterInProjectComponents {
+			if showThirdPartyImports {
+				sb.WriteString(`"` + p.ID() + `" -> "` + importedComponent.ID() + `"` + "\n")
+			} else {
 				if importedComponent.IsInProject() {
 					sb.WriteString(`"` + p.ID() + `" -> "` + importedComponent.ID() + `"` + "\n")
 				}
-			} else {
-				sb.WriteString(`"` + p.ID() + `" -> "` + importedComponent.ID() + `"` + "\n")
 			}
 
 		}
