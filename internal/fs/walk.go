@@ -50,6 +50,8 @@ func (w *Walk) FindComponentsAndImports() error {
 			return nil
 		}
 
+		namespace = namespace.TrimPrefix(w.projectDir + "/")
+
 		c := w.componentRegistry.GetOrAddComponent(namespace)
 		p := component.NewPackage(c)
 		p.ParseImportsOfGoFile(moduleName, path, w.componentRegistry)
