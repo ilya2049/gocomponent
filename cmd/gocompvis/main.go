@@ -9,6 +9,7 @@ import (
 
 func main() {
 	projectDir := flag.String("dir", "./", "project directory")
+	filterInProjectComponents := flag.Bool("in-project", false, "filter the 'in project' components")
 
 	flag.Parse()
 
@@ -20,7 +21,7 @@ func main() {
 		return
 	}
 
-	graph := walk.ConvertComponentsAndImportsToDotGraphDotGraph()
+	graph := walk.ConvertComponentsAndImportsToDotGraphDotGraph(*filterInProjectComponents)
 
 	fmt.Println(graph)
 }

@@ -46,6 +46,8 @@ func (w *Walk) FindComponentsAndImports() error {
 		namespace = namespace.TrimPrefix(w.projectDir + "/")
 
 		c := w.componentRegistry.GetOrAddComponent(namespace)
+		c.InProject()
+
 		p := component.NewPackage(c)
 		p.ParseImportsOfGoFile(moduleName, path, w.componentRegistry)
 
@@ -74,7 +76,7 @@ func (w *Walk) addPackage(namespace component.Namespace, newPackage *component.P
 	w.packages[namespace] = newPackage
 }
 
-func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph() string {
+func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph(filterInProjectComponents bool) string {
 	sb := strings.Builder{}
 
 	sb.WriteString("digraph {\n")
@@ -83,7 +85,15 @@ func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph() string {
 		sb.WriteString(`"` + p.ID() + `"` + "\n")
 
 		for _, importedComponent := range p.Imports() {
-			sb.WriteString(`"` + p.ID() + `" -> "` + importedComponent.ID() + `"` + "\n")
+
+			if filterInProjectComponents {
+				if importedComponent.IsInProject() {
+					sb.WriteString(`"` + p.ID() + `" -> "` + importedComponent.ID() + `"` + "\n")
+				}
+			} else {
+				sb.WriteString(`"` + p.ID() + `" -> "` + importedComponent.ID() + `"` + "\n")
+			}
+
 		}
 	}
 

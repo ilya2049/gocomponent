@@ -32,13 +32,21 @@ func (p *Package) ParseImportsOfGoFile(
 	for _, imp := range file.Imports {
 		namespace := NewNamespace(imp.Path.Value[1 : len(imp.Path.Value)-1])
 
-		namespace = namespace.TrimPrefix(moduleName + "/")
+		var componentIsInProject bool
+
+		if namespace.HasPrefix(moduleName + "/") {
+			namespace = namespace.TrimPrefix(moduleName + "/")
+			componentIsInProject = true
+		}
 
 		if namespace == p.namespace {
 			continue
 		}
 
 		c := componentRegistry.GetOrAddComponent(namespace)
+		if componentIsInProject {
+			c.InProject()
+		}
 
 		p.imports[namespace] = c
 	}
