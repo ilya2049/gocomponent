@@ -13,20 +13,26 @@ type Walk struct {
 	projectDir        string
 	componentRegistry *component.Registry
 	packages          map[component.Namespace]*component.Package
+	isDebug           bool
 }
 
-func NewWalk(projectDir string) *Walk {
+func NewWalk(projectDir string, isDebug bool) *Walk {
 	return &Walk{
 		projectDir:        projectDir,
 		componentRegistry: component.NewRegistry(),
 		packages:          make(map[component.Namespace]*component.Package),
+		isDebug:           isDebug,
 	}
 }
 
 func (w *Walk) FindComponentsAndImports() error {
-	moduleName, err := readModuleName()
+	moduleName, err := readModuleName(w.projectDir)
 	if err != nil {
 		return err
+	}
+
+	if w.isDebug {
+		fmt.Println("module", moduleName)
 	}
 
 	err = filepath.Walk(w.projectDir+"/", func(path string, info os.FileInfo, err error) error {
@@ -80,7 +86,15 @@ func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph() string {
 	for _, p := range w.packages {
 		sb.WriteString(`"` + p.ID() + `"` + "\n")
 
+		if w.isDebug {
+			fmt.Println("package ns:", p.Namespace())
+		}
+
 		for _, importedComponent := range p.Imports() {
+			if w.isDebug {
+				fmt.Println("import ns:", importedComponent.Namespace())
+			}
+
 			sb.WriteString(`"` + p.ID() + `" -> "` + importedComponent.ID() + `"` + "\n")
 		}
 	}

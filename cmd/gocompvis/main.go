@@ -9,10 +9,11 @@ import (
 
 func main() {
 	projectDir := flag.String("dir", "./", "project directory")
+	debug := flag.Bool("debug", false, "enable debug mode")
 
 	flag.Parse()
 
-	walk := fs.NewWalk(*projectDir)
+	walk := fs.NewWalk(*projectDir, *debug)
 
 	if err := walk.FindComponentsAndImports(); err != nil {
 		fmt.Println(err)

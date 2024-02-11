@@ -19,3 +19,7 @@ func (c *Component) ExtendID() {
 func (c *Component) ID() string {
 	return c.id
 }
+
+func (c *Component) Namespace() string {
+	return string(c.namespace)
+}
