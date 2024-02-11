@@ -9,7 +9,7 @@ import (
 )
 
 func TestRegistry_MakeUniqueComponentIDs(t *testing.T) {
-	registry := component.NewRegistry()
+	registry := component.NewRegistry(false)
 
 	_ = registry.GetOrAddComponent(component.NewNamespace("postgresql/repository/user/edit"))
 	_ = registry.GetOrAddComponent(component.NewNamespace("domain/user/edit"))

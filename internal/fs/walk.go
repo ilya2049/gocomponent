@@ -19,7 +19,7 @@ type Walk struct {
 func NewWalk(projectDir string, isDebug bool) *Walk {
 	return &Walk{
 		projectDir:        projectDir,
-		componentRegistry: component.NewRegistry(),
+		componentRegistry: component.NewRegistry(isDebug),
 		packages:          make(map[component.Namespace]*component.Package),
 		isDebug:           isDebug,
 	}
@@ -32,6 +32,7 @@ func (w *Walk) FindComponentsAndImports() error {
 	}
 
 	if w.isDebug {
+		fmt.Println("DEBUG", "module", moduleName)
 		fmt.Println("module", moduleName)
 	}
 
@@ -79,6 +80,10 @@ func (w *Walk) addPackage(namespace component.Namespace, newPackage *component.P
 }
 
 func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph() string {
+	if w.isDebug {
+		fmt.Println("DEBUG", "dot graph")
+	}
+
 	sb := strings.Builder{}
 
 	sb.WriteString("digraph {\n")
