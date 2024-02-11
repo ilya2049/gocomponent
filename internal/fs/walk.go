@@ -13,15 +13,13 @@ type Walk struct {
 	projectDir        string
 	componentRegistry *component.Registry
 	packages          map[component.Namespace]*component.Package
-	isDebug           bool
 }
 
-func NewWalk(projectDir string, isDebug bool) *Walk {
+func NewWalk(projectDir string) *Walk {
 	return &Walk{
 		projectDir:        projectDir,
-		componentRegistry: component.NewRegistry(isDebug),
+		componentRegistry: component.NewRegistry(),
 		packages:          make(map[component.Namespace]*component.Package),
-		isDebug:           isDebug,
 	}
 }
 
@@ -29,11 +27,6 @@ func (w *Walk) FindComponentsAndImports() error {
 	moduleName, err := readModuleName(w.projectDir)
 	if err != nil {
 		return err
-	}
-
-	if w.isDebug {
-		fmt.Println("DEBUG", "module", moduleName)
-		fmt.Println("module", moduleName)
 	}
 
 	err = filepath.Walk(w.projectDir+"/", func(path string, info os.FileInfo, err error) error {
@@ -82,10 +75,6 @@ func (w *Walk) addPackage(namespace component.Namespace, newPackage *component.P
 }
 
 func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph() string {
-	if w.isDebug {
-		fmt.Println("DEBUG", "dot graph")
-	}
-
 	sb := strings.Builder{}
 
 	sb.WriteString("digraph {\n")
@@ -93,15 +82,7 @@ func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph() string {
 	for _, p := range w.packages {
 		sb.WriteString(`"` + p.ID() + `"` + "\n")
 
-		if w.isDebug {
-			fmt.Println("package ns:", p.Namespace())
-		}
-
 		for _, importedComponent := range p.Imports() {
-			if w.isDebug {
-				fmt.Println("import ns:", importedComponent.Namespace())
-			}
-
 			sb.WriteString(`"` + p.ID() + `" -> "` + importedComponent.ID() + `"` + "\n")
 		}
 	}

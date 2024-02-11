@@ -1,16 +1,12 @@
 package component
 
-import "fmt"
-
 type Registry struct {
 	components map[Namespace]*Component
-	isDebug    bool
 }
 
-func NewRegistry(isDebug bool) *Registry {
+func NewRegistry() *Registry {
 	return &Registry{
 		components: make(map[Namespace]*Component),
-		isDebug:    isDebug,
 	}
 }
 
@@ -28,10 +24,6 @@ func (r *Registry) GetOrAddComponent(namespace Namespace) *Component {
 }
 
 func (r *Registry) MakeUniqueComponentIDs() {
-	if r.isDebug {
-		fmt.Println("DEBUG", "unique component ids")
-	}
-
 	components := r.Components()
 
 	for len(components) > 0 {
@@ -42,10 +34,6 @@ func (r *Registry) MakeUniqueComponentIDs() {
 			if components[i].ID() == firstComponent.ID() {
 				isComponentIDUnique = false
 				components[i].ExtendID()
-
-				if r.isDebug {
-					fmt.Println("extended id", components[i].ID(), "( ns", components[i].Namespace(), ")")
-				}
 			}
 		}
 
