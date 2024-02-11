@@ -1,25 +1,25 @@
 package component
 
 type Component struct {
-	namespace   Namespace
-	id          string
-	isInProject bool
+	namespace    Namespace
+	id           string
+	isThirdParty bool
 }
 
 func New(namespace Namespace) *Component {
 	return &Component{
-		namespace:   namespace,
-		id:          "",
-		isInProject: false,
+		namespace:    namespace,
+		id:           "",
+		isThirdParty: false,
 	}
 }
 
-func (c *Component) InProject() {
-	c.isInProject = true
+func (c *Component) MarkAsThirdParty() {
+	c.isThirdParty = true
 }
 
-func (c *Component) IsInProject() bool {
-	return c.isInProject
+func (c *Component) IsThirdParty() bool {
+	return c.isThirdParty
 }
 
 func (c *Component) ExtendID() {

@@ -46,7 +46,6 @@ func (w *Walk) FindComponentsAndImports() error {
 		namespace = namespace.TrimPrefix(w.projectDir + "/")
 
 		c := w.componentRegistry.GetOrAddComponent(namespace)
-		c.InProject()
 
 		p := component.NewPackage(c)
 		p.ParseImportsOfGoFile(moduleName, path, w.componentRegistry)
@@ -89,7 +88,7 @@ func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph(showThirdPartyImpor
 			if showThirdPartyImports {
 				sb.WriteString(`"` + p.ID() + `" -> "` + importedComponent.ID() + `"` + "\n")
 			} else {
-				if importedComponent.IsInProject() {
+				if !importedComponent.IsThirdParty() {
 					sb.WriteString(`"` + p.ID() + `" -> "` + importedComponent.ID() + `"` + "\n")
 				}
 			}

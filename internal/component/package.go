@@ -44,8 +44,8 @@ func (p *Package) ParseImportsOfGoFile(
 		}
 
 		c := componentRegistry.GetOrAddComponent(namespace)
-		if componentIsInProject {
-			c.InProject()
+		if !componentIsInProject {
+			c.MarkAsThirdParty()
 		}
 
 		p.imports[namespace] = c
