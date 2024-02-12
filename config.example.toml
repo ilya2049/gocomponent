@@ -1,3 +1,7 @@
 project_directory = "./"
 
 hide_third_party_imports = false
+
+include_only_next_package_namespaces = [
+    "internal"
+]

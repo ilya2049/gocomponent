@@ -30,6 +30,20 @@ func (p *Project) ExcludeThirdPartyImports() {
 	}
 }
 
+func (p *Project) IncludeOnlyNextPackageNamespaces(selectedPackageNamespaces []string) {
+	filteredPackages := make(map[Namespace]*Package)
+
+	for namespace, aPackage := range p.packages {
+		for _, selectedNamespace := range selectedPackageNamespaces {
+			if namespace.Contains(NewNamespace(selectedNamespace)) {
+				filteredPackages[namespace] = aPackage
+			}
+		}
+	}
+
+	p.packages = filteredPackages
+}
+
 func (p *Project) Packages() []*Package {
 	packages := make([]*Package, 0, len(p.packages))
 

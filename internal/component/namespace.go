@@ -45,7 +45,7 @@ func (ns Namespace) ExtendComponentID(sections string) string {
 }
 
 func (ns Namespace) Contains(another Namespace) bool {
-	return !strings.Contains(string(ns), string(another))
+	return strings.Contains(string(ns), string(another))
 }
 
 func (ns Namespace) HasPrefix(prefix string) bool {

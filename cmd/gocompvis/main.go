@@ -41,6 +41,10 @@ func main() {
 		project.ExcludeThirdPartyImports()
 	}
 
+	if len(conf.IncludeOnlyNextPackageNamespaces) > 0 {
+		project.IncludeOnlyNextPackageNamespaces(conf.IncludeOnlyNextPackageNamespaces)
+	}
+
 	dotExporter := dot.NewExporter()
 
 	fmt.Println(dotExporter.Export(project.Packages()))
