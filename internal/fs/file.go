@@ -31,7 +31,7 @@ var ErrFirstLineOfGoModShouldIncludeExactlyTwoPArts = errors.New(
 )
 
 func readModuleName(projectDir string) (string, error) {
-	goModFileContents, err := os.ReadFile(projectDir + "/go.mod")
+	goModFileContents, err := os.ReadFile(projectDir + "go.mod")
 	if err != nil {
 		return "", fmt.Errorf("read go.mod: %w", err)
 	}

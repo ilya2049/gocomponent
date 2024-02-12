@@ -16,6 +16,10 @@ type Walk struct {
 }
 
 func NewWalk(projectDir string) *Walk {
+	if !strings.HasSuffix(projectDir, "/") {
+		projectDir += "/"
+	}
+
 	return &Walk{
 		projectDir:        projectDir,
 		componentRegistry: component.NewRegistry(),
@@ -29,7 +33,7 @@ func (w *Walk) FindComponentsAndImports() error {
 		return err
 	}
 
-	err = filepath.Walk(w.projectDir+"/", func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(w.projectDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return fmt.Errorf("walk err: %w", err)
 		}
@@ -43,14 +47,14 @@ func (w *Walk) FindComponentsAndImports() error {
 			return nil
 		}
 
-		namespace = namespace.TrimPrefix(w.projectDir + "/")
+		namespace = namespace.TrimPrefix(w.projectDir)
 
 		c := w.componentRegistry.GetOrAddComponent(namespace)
 
 		p := component.NewPackage(c)
 		p.ParseImportsOfGoFile(moduleName, path, w.componentRegistry)
 
-		w.addPackage(namespace, p)
+		w.addPackageInProject(namespace, p)
 
 		return nil
 	})
@@ -64,7 +68,7 @@ func (w *Walk) FindComponentsAndImports() error {
 	return nil
 }
 
-func (w *Walk) addPackage(namespace component.Namespace, newPackage *component.Package) {
+func (w *Walk) addPackageInProject(namespace component.Namespace, newPackage *component.Package) {
 	existingPackage, ok := w.project.FindPackage(namespace)
 	if ok {
 		existingPackage.Join(newPackage)
