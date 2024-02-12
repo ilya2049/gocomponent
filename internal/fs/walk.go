@@ -2,6 +2,8 @@ package fs
 
 import (
 	"fmt"
+	"go/parser"
+	"go/token"
 	"os"
 	"path/filepath"
 	"strings"
@@ -48,13 +50,16 @@ func (w *Walk) FindComponentsAndImports() error {
 		}
 
 		namespace = namespace.TrimPrefix(w.projectDir)
+		aComponent := w.componentRegistry.GetOrAddComponent(namespace)
 
-		c := w.componentRegistry.GetOrAddComponent(namespace)
+		packageImports, err := w.parseImportsOfGoFile(namespace, moduleName, path)
+		if err != nil {
+			return err
+		}
 
-		p := component.NewPackage(c)
-		p.ParseImportsOfGoFile(moduleName, path, w.componentRegistry)
+		aPackage := component.NewPackage(aComponent, packageImports)
 
-		w.addPackageInProject(namespace, p)
+		w.addPackageInProject(namespace, aPackage)
 
 		return nil
 	})
@@ -102,4 +107,43 @@ func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph(showThirdPartyImpor
 	sb.WriteString("}")
 
 	return sb.String()
+}
+
+func (w *Walk) parseImportsOfGoFile(
+	currentNamespace component.Namespace,
+	moduleName string,
+	goFileName string,
+) (map[component.Namespace]*component.Component, error) {
+	file, err := parser.ParseFile(token.NewFileSet(), goFileName, nil, parser.Mode(0))
+	if err != nil {
+		return nil, fmt.Errorf("parse file: %w", err)
+	}
+
+	imports := make(map[component.Namespace]*component.Component)
+
+	for _, fileImport := range file.Imports {
+		namespace := component.NewNamespace(fileImport.Path.Value[1 : len(fileImport.Path.Value)-1])
+
+		var isComponentInProject bool
+
+		moduleNameWithSlash := moduleName + "/"
+
+		if namespace.HasPrefix(moduleNameWithSlash) {
+			namespace = namespace.TrimPrefix(moduleNameWithSlash)
+			isComponentInProject = true
+		}
+
+		if namespace == currentNamespace {
+			continue
+		}
+
+		component := w.componentRegistry.GetOrAddComponent(namespace)
+		if !isComponentInProject {
+			component.MarkAsThirdParty()
+		}
+
+		imports[namespace] = component
+	}
+
+	return imports, nil
 }
