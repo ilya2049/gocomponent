@@ -20,6 +20,16 @@ func (p *Project) AddPackage(namespace Namespace, pkg *Package) {
 	p.packages[namespace] = pkg
 }
 
+func (p *Project) ExcludeThirdPartyImports() {
+	for _, aPackage := range p.packages {
+		for _, packageImport := range aPackage.imports {
+			if packageImport.isThirdParty {
+				delete(aPackage.imports, packageImport.namespace)
+			}
+		}
+	}
+}
+
 func (p *Project) Packages() []*Package {
 	packages := make([]*Package, 0, len(p.packages))
 

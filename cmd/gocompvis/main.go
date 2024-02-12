@@ -6,7 +6,9 @@ import (
 
 	"github.com/BurntSushi/toml"
 
+	"github.com/ilya2049/gocomponent/internal/component"
 	"github.com/ilya2049/gocomponent/internal/config"
+	"github.com/ilya2049/gocomponent/internal/dot"
 	"github.com/ilya2049/gocomponent/internal/fs"
 )
 
@@ -25,7 +27,9 @@ func main() {
 		return
 	}
 
-	walk := fs.NewWalk(conf.ProjectDirectory)
+	project := component.NewProject()
+
+	walk := fs.NewWalk(conf.ProjectDirectory, project)
 
 	if err := walk.FindComponentsAndImports(); err != nil {
 		fmt.Println(err)
@@ -33,7 +37,11 @@ func main() {
 		return
 	}
 
-	graph := walk.ConvertComponentsAndImportsToDotGraphDotGraph(conf.ShowThirdPartyImports)
+	if conf.HideThirdPartyImports {
+		project.ExcludeThirdPartyImports()
+	}
 
-	fmt.Println(graph)
+	dotExporter := dot.NewExporter()
+
+	fmt.Println(dotExporter.Export(project.Packages()))
 }

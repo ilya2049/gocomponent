@@ -17,7 +17,7 @@ type Walk struct {
 	project           *component.Project
 }
 
-func NewWalk(projectDir string) *Walk {
+func NewWalk(projectDir string, project *component.Project) *Walk {
 	if !strings.HasSuffix(projectDir, "/") {
 		projectDir += "/"
 	}
@@ -25,7 +25,7 @@ func NewWalk(projectDir string) *Walk {
 	return &Walk{
 		projectDir:        projectDir,
 		componentRegistry: component.NewRegistry(),
-		project:           component.NewProject(),
+		project:           project,
 	}
 }
 
@@ -82,31 +82,6 @@ func (w *Walk) addPackageInProject(namespace component.Namespace, newPackage *co
 	}
 
 	w.project.AddPackage(namespace, newPackage)
-}
-
-func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph(showThirdPartyImports bool) string {
-	sb := strings.Builder{}
-
-	sb.WriteString("digraph {\n")
-
-	for _, p := range w.project.Packages() {
-		sb.WriteString(`"` + p.ID() + `"` + "\n")
-
-		for _, importedComponent := range p.Imports() {
-
-			if showThirdPartyImports {
-				sb.WriteString(`"` + p.ID() + `" -> "` + importedComponent.ID() + `"` + "\n")
-			} else {
-				if !importedComponent.IsThirdParty() {
-					sb.WriteString(`"` + p.ID() + `" -> "` + importedComponent.ID() + `"` + "\n")
-				}
-			}
-		}
-	}
-
-	sb.WriteString("}")
-
-	return sb.String()
 }
 
 func (w *Walk) parseImportsOfGoFile(

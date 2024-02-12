@@ -18,10 +18,6 @@ func (c *Component) MarkAsThirdParty() {
 	c.isThirdParty = true
 }
 
-func (c *Component) IsThirdParty() bool {
-	return c.isThirdParty
-}
-
 func (c *Component) ExtendID() {
 	c.id = c.namespace.ExtendComponentID(c.id)
 }
