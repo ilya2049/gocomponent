@@ -12,14 +12,14 @@ import (
 type Walk struct {
 	projectDir        string
 	componentRegistry *component.Registry
-	packages          map[component.Namespace]*component.Package
+	project           *component.Project
 }
 
 func NewWalk(projectDir string) *Walk {
 	return &Walk{
 		projectDir:        projectDir,
 		componentRegistry: component.NewRegistry(),
-		packages:          make(map[component.Namespace]*component.Package),
+		project:           component.NewProject(),
 	}
 }
 
@@ -65,14 +65,14 @@ func (w *Walk) FindComponentsAndImports() error {
 }
 
 func (w *Walk) addPackage(namespace component.Namespace, newPackage *component.Package) {
-	existingPackage, ok := w.packages[namespace]
+	existingPackage, ok := w.project.FindPackage(namespace)
 	if ok {
 		existingPackage.Join(newPackage)
 
 		return
 	}
 
-	w.packages[namespace] = newPackage
+	w.project.AddPackage(namespace, newPackage)
 }
 
 func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph(showThirdPartyImports bool) string {
@@ -80,7 +80,7 @@ func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph(showThirdPartyImpor
 
 	sb.WriteString("digraph {\n")
 
-	for _, p := range w.packages {
+	for _, p := range w.project.Packages() {
 		sb.WriteString(`"` + p.ID() + `"` + "\n")
 
 		for _, importedComponent := range p.Imports() {
@@ -92,7 +92,6 @@ func (w *Walk) ConvertComponentsAndImportsToDotGraphDotGraph(showThirdPartyImpor
 					sb.WriteString(`"` + p.ID() + `" -> "` + importedComponent.ID() + `"` + "\n")
 				}
 			}
-
 		}
 	}
 

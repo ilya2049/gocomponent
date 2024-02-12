@@ -6,6 +6,36 @@ import (
 	"go/token"
 )
 
+type Project struct {
+	packages map[Namespace]*Package
+}
+
+func NewProject() *Project {
+	return &Project{
+		packages: make(map[Namespace]*Package),
+	}
+}
+
+func (p *Project) FindPackage(namespace Namespace) (*Package, bool) {
+	pkg, ok := p.packages[namespace]
+
+	return pkg, ok
+}
+
+func (p *Project) AddPackage(namespace Namespace, pkg *Package) {
+	p.packages[namespace] = pkg
+}
+
+func (p *Project) Packages() []*Package {
+	packages := make([]*Package, 0, len(p.packages))
+
+	for _, p := range p.packages {
+		packages = append(packages, p)
+	}
+
+	return packages
+}
+
 type Package struct {
 	*Component
 
