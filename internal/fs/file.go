@@ -10,7 +10,10 @@ import (
 	"github.com/ilya2049/gocomponent/internal/component"
 )
 
-var namespaceRegexp = regexp.MustCompile(`(.*)/.*\.go`)
+var (
+	namespaceRegexp = regexp.MustCompile(`(.*)/.*\.go`)
+	goFileRegexp    = regexp.MustCompile(`^.*\.go$`)
+)
 
 func findNamespaceInPath(path string) (component.Namespace, bool) {
 	matches := namespaceRegexp.FindStringSubmatch(path)
@@ -23,7 +26,7 @@ func findNamespaceInPath(path string) (component.Namespace, bool) {
 }
 
 func isGoSourceFile(path string) bool {
-	return strings.Contains(path, ".go")
+	return goFileRegexp.MatchString(path)
 }
 
 var ErrFirstLineOfGoModShouldIncludeExactlyTwoPArts = errors.New(
