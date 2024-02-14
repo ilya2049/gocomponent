@@ -4,48 +4,20 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/BurntSushi/toml"
-
-	"github.com/ilya2049/gocomponent/internal/component"
-	"github.com/ilya2049/gocomponent/internal/config"
-	"github.com/ilya2049/gocomponent/internal/dot"
-	"github.com/ilya2049/gocomponent/internal/fs"
+	"github.com/ilya2049/gocomponent/internal/httpserver"
 )
 
 func main() {
-	configContents, err := os.ReadFile("config.toml")
-	if err != nil {
-		fmt.Printf("read config: %s\n", err.Error())
-
-		return
+	address := os.Getenv("ADDR")
+	if address == "" {
+		address = ":8080"
 	}
 
-	var conf config.Config
-	if _, err := toml.Decode(string(configContents), &conf); err != nil {
-		fmt.Printf("decode config: %s\n", err.Error())
+	httpServer := httpserver.New(address)
 
-		return
-	}
+	fmt.Println("Server started at", address)
 
-	project := component.NewProject()
-
-	walk := fs.NewWalk(conf.ProjectDirectory, project)
-
-	if err := walk.FindComponentsAndImports(); err != nil {
+	if err := httpServer.ListenAndServe(); err != nil {
 		fmt.Println(err)
-
-		return
 	}
-
-	if conf.HideThirdPartyImports {
-		project.ExcludeThirdPartyImports()
-	}
-
-	if len(conf.IncludeOnlyNextPackageNamespaces) > 0 {
-		project.IncludeOnlyNextPackageNamespaces(conf.IncludeOnlyNextPackageNamespaces)
-	}
-
-	dotExporter := dot.NewExporter()
-
-	fmt.Println(dotExporter.Export(project.Packages()))
 }

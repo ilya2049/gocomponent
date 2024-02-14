@@ -6,14 +6,14 @@ import (
 	"github.com/ilya2049/gocomponent/internal/component"
 )
 
-type Exporter struct {
+type exporter struct {
 }
 
-func NewExporter() *Exporter {
-	return &Exporter{}
+func newExporter() *exporter {
+	return &exporter{}
 }
 
-func (e *Exporter) Export(packages []*component.Package) string {
+func (e *exporter) export(packages []*component.Package) string {
 	sb := strings.Builder{}
 
 	sb.WriteString(e.startGraph())
@@ -31,18 +31,18 @@ func (e *Exporter) Export(packages []*component.Package) string {
 	return sb.String()
 }
 
-func (*Exporter) startGraph() string {
+func (*exporter) startGraph() string {
 	return "digraph {\n"
 }
 
-func (*Exporter) completeGraph() string {
+func (*exporter) completeGraph() string {
 	return "}"
 }
 
-func (*Exporter) addPackageInGraph(aPackage *component.Package) string {
+func (*exporter) addPackageInGraph(aPackage *component.Package) string {
 	return `"` + aPackage.ID() + `"` + "\n"
 }
 
-func (*Exporter) addImportInGraph(aPackage *component.Package, importedComponent *component.Component) string {
+func (*exporter) addImportInGraph(aPackage *component.Package, importedComponent *component.Component) string {
 	return `"` + aPackage.ID() + `" -> "` + importedComponent.ID() + `"` + "\n"
 }
