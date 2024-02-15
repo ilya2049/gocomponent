@@ -79,7 +79,7 @@ func printNamespaces(cCtx *cli.Context) error {
 	}
 
 	for _, pkg := range project.Packages() {
-		fmt.Println(pkg.Namespace())
+		fmt.Println(pkg.Namespace(), "["+pkg.ID()+"]")
 	}
 
 	return nil
