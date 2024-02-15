@@ -1,25 +1,15 @@
 package dot
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/BurntSushi/toml"
-
 	"github.com/ilya2049/gocomponent/internal/component"
 	"github.com/ilya2049/gocomponent/internal/config"
 	"github.com/ilya2049/gocomponent/internal/fs"
 )
 
 func GenerateGraph() string {
-	configContents, err := os.ReadFile("config.toml")
+	conf, err := config.Read()
 	if err != nil {
-		return fmt.Sprintf("read config: %s\n", err.Error())
-	}
-
-	var conf config.Config
-	if _, err := toml.Decode(string(configContents), &conf); err != nil {
-		return fmt.Sprintf("decode config: %s\n", err.Error())
+		return err.Error()
 	}
 
 	project := component.NewProject()
