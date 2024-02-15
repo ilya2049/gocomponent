@@ -50,6 +50,11 @@ func (w *Walk) FindComponentsAndImports() error {
 		}
 
 		namespace = namespace.TrimPrefix(w.projectDir)
+
+		if namespace+"/" == component.Namespace(w.projectDir) {
+			namespace = component.NewNamespace(moduleName)
+		}
+
 		aComponent := w.componentRegistry.GetOrAddComponent(namespace)
 
 		packageImports, err := w.parseImportsOfGoFile(namespace, moduleName, path)
