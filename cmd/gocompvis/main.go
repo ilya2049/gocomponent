@@ -4,20 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ilya2049/gocomponent/internal/httpserver"
+	"github.com/ilya2049/gocomponent/internal/cli"
 )
 
 func main() {
-	address := os.Getenv("ADDR")
-	if address == "" {
-		address = ":8080"
-	}
-
-	httpServer := httpserver.New(address)
-
-	fmt.Println("Server started at", address)
-
-	if err := httpServer.ListenAndServe(); err != nil {
+	if err := cli.NewApp().Run(os.Args); err != nil {
 		fmt.Println(err)
 	}
 }
