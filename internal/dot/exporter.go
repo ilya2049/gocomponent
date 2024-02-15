@@ -7,10 +7,13 @@ import (
 )
 
 type exporter struct {
+	nameSpaceColors map[string]string
 }
 
-func newExporter() *exporter {
-	return &exporter{}
+func newExporter(nameSpaceColors map[string]string) *exporter {
+	return &exporter{
+		nameSpaceColors: nameSpaceColors,
+	}
 }
 
 func (e *exporter) export(packages []*component.Package) string {
@@ -39,8 +42,16 @@ func (*exporter) completeGraph() string {
 	return "}"
 }
 
-func (*exporter) addPackageInGraph(aPackage *component.Package) string {
-	return `"` + aPackage.ID() + `"` + "\n"
+func (e *exporter) addPackageInGraph(aPackage *component.Package) string {
+	packageNode := `"` + aPackage.ID() + `"`
+
+	for ns, nsColor := range e.nameSpaceColors {
+		if strings.Contains(aPackage.Namespace(), ns) {
+			packageNode += " [color=black, fillcolor=" + nsColor + ", style=filled]"
+		}
+	}
+
+	return packageNode + "\n"
 }
 
 func (*exporter) addImportInGraph(aPackage *component.Package, importedComponent *component.Component) string {

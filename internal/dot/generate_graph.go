@@ -28,7 +28,7 @@ func GenerateGraph() string {
 		project.IncludeOnlyNextPackageNamespaces(conf.IncludeOnlyNextPackageNamespaces)
 	}
 
-	dotExporter := newExporter()
+	dotExporter := newExporter(conf.NamespaceColors)
 
 	return dotExporter.export(project.Packages())
 }
