@@ -5,3 +5,7 @@ hide_third_party_imports = false
 include_only_next_package_namespaces = [
     "internal"
 ]
+
+[namespace_colors]
+"json" = "green"
+"server" = "cyan"
