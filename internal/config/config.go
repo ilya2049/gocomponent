@@ -9,7 +9,7 @@ import (
 
 type Config struct {
 	ProjectDirectory                 string            `toml:"project_directory"`
-	HideThirdPartyImports            bool              `toml:"hide_third_party_imports"`
+	IncludeThirdPartyComponents      bool              `toml:"include_third_party_components"`
 	IncludeOnlyNextPackageNamespaces []string          `toml:"include_only_next_package_namespaces"`
 	NamespaceColors                  map[string]string `toml:"namespace_colors"`
 }

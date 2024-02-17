@@ -26,8 +26,8 @@ func GenerateGraph() string {
 
 	componentGraph := project.CreateComponentGraph()
 
-	if conf.HideThirdPartyImports {
-		componentGraph = componentGraph.RemoveThirdPartyImports()
+	if !conf.IncludeThirdPartyComponents {
+		componentGraph = componentGraph.RemoveThirdPartyComponents()
 	}
 
 	dotExporter := newExporter(conf.NamespaceColors)

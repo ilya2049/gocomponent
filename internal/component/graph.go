@@ -20,7 +20,7 @@ func (g *Graph) Imports() Imports {
 	return g.imports
 }
 
-func (g *Graph) RemoveThirdPartyImports() *Graph {
+func (g *Graph) RemoveThirdPartyComponents() *Graph {
 	newComponents := make(Components, 0)
 
 	for _, component := range g.Components() {
