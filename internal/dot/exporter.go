@@ -22,7 +22,7 @@ func (*exporter) export(g *component.Graph) string {
 	sb.WriteString("digraph {\n")
 
 	for _, component := range g.Components() {
-		sb.WriteString(`"` + component.ID() + `"` + "\n")
+		sb.WriteString(`"` + component.ID() + `"` + " [shape=component]\n")
 	}
 
 	for _, imp := range g.Imports() {
