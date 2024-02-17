@@ -2,11 +2,59 @@ package component
 
 type Project struct {
 	packages map[Namespace]*Package
+
+	components map[Namespace]*Component
 }
 
 func NewProject() *Project {
 	return &Project{
-		packages: make(map[Namespace]*Package),
+		packages:   make(map[Namespace]*Package),
+		components: make(map[Namespace]*Component),
+	}
+}
+
+func (p *Project) GetOrAddComponent(namespace Namespace) *Component {
+	existingComponent, ok := p.components[namespace]
+	if ok {
+		return existingComponent
+	}
+
+	newComponent := New(namespace)
+
+	p.components[namespace] = newComponent
+
+	return newComponent
+}
+
+func (p *Project) Components() []*Component {
+	var components []*Component
+
+	for _, component := range p.components {
+		components = append(components, component)
+	}
+
+	return components
+}
+
+func (p *Project) MakeUniqueComponentIDs() {
+	components := p.Components()
+
+	for len(components) > 0 {
+		firstComponent := components[0]
+		isComponentIDUnique := true
+
+		for i := 1; i < len(components); i++ {
+			if components[i].ID() == firstComponent.ID() {
+				isComponentIDUnique = false
+				components[i].ExtendID()
+			}
+		}
+
+		if isComponentIDUnique {
+			components = components[1:]
+		} else {
+			firstComponent.ExtendID()
+		}
 	}
 }
 

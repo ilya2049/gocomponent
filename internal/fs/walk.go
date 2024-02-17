@@ -12,9 +12,8 @@ import (
 )
 
 type Walk struct {
-	projectDir        string
-	componentRegistry *component.Registry
-	project           *component.Project
+	projectDir string
+	project    *component.Project
 }
 
 func NewWalk(projectDir string, project *component.Project) *Walk {
@@ -23,9 +22,8 @@ func NewWalk(projectDir string, project *component.Project) *Walk {
 	}
 
 	return &Walk{
-		projectDir:        projectDir,
-		componentRegistry: component.NewRegistry(),
-		project:           project,
+		projectDir: projectDir,
+		project:    project,
 	}
 }
 
@@ -55,7 +53,7 @@ func (w *Walk) FindComponentsAndImports() error {
 			namespace = component.NewNamespace(moduleName)
 		}
 
-		aComponent := w.componentRegistry.GetOrAddComponent(namespace)
+		aComponent := w.project.GetOrAddComponent(namespace)
 
 		packageImports, err := w.parseImportsOfGoFile(namespace, moduleName, path)
 		if err != nil {
@@ -73,7 +71,7 @@ func (w *Walk) FindComponentsAndImports() error {
 		return err
 	}
 
-	w.componentRegistry.MakeUniqueComponentIDs()
+	w.project.MakeUniqueComponentIDs()
 
 	return nil
 }
@@ -117,7 +115,7 @@ func (w *Walk) parseImportsOfGoFile(
 			continue
 		}
 
-		component := w.componentRegistry.GetOrAddComponent(namespace)
+		component := w.project.GetOrAddComponent(namespace)
 		if !isComponentInProject {
 			component.MarkAsThirdParty()
 		}
