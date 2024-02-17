@@ -26,8 +26,8 @@ func (p *Project) GetOrAddComponent(namespace Namespace) *Component {
 	return newComponent
 }
 
-func (p *Project) Components() []*Component {
-	var components []*Component
+func (p *Project) Components() Components {
+	var components Components
 
 	for _, component := range p.components {
 		components = append(components, component)
@@ -68,16 +68,6 @@ func (p *Project) AddPackage(namespace Namespace, pkg *Package) {
 	p.packages[namespace] = pkg
 }
 
-func (p *Project) ExcludeThirdPartyImports() {
-	for _, aPackage := range p.packages {
-		for _, packageImport := range aPackage.imports {
-			if packageImport.isThirdParty {
-				delete(aPackage.imports, packageImport.namespace)
-			}
-		}
-	}
-}
-
 func (p *Project) IncludeOnlyNextPackageNamespaces(selectedPackageNamespaces []string) {
 	filteredPackages := make(map[Namespace]*Package)
 
@@ -102,31 +92,16 @@ func (p *Project) Packages() []*Package {
 	return packages
 }
 
-type Package struct {
-	*Component
+func (p *Project) CreateComponentGraph() *Graph {
+	imports := make(Imports, 0)
 
-	imports map[Namespace]*Component
-}
-
-func NewPackage(c *Component, imports map[Namespace]*Component) *Package {
-	return &Package{
-		Component: c,
-		imports:   imports,
-	}
-}
-
-func (p *Package) Join(anotherPackage *Package) {
-	for namespace, component := range anotherPackage.imports {
-		p.imports[namespace] = component
-	}
-}
-
-func (p *Package) Imports() []*Component {
-	var components []*Component
-
-	for _, component := range p.imports {
-		components = append(components, component)
+	for _, p := range p.packages {
+		for _, importedComponent := range p.Imports() {
+			imports = append(imports, NewImport(p.Component, importedComponent))
+		}
 	}
 
-	return components
+	g := NewGraph(p.Components(), imports)
+
+	return g
 }

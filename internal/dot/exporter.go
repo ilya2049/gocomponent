@@ -16,44 +16,20 @@ func newExporter(nameSpaceColors map[string]string) *exporter {
 	}
 }
 
-func (e *exporter) export(packages []*component.Package) string {
+func (*exporter) export(g *component.Graph) string {
 	sb := strings.Builder{}
 
-	sb.WriteString(e.startGraph())
+	sb.WriteString("digraph {\n")
 
-	for _, p := range packages {
-		sb.WriteString(e.addPackageInGraph(p))
-
-		for _, importedComponent := range p.Imports() {
-			sb.WriteString(e.addImportInGraph(p, importedComponent))
-		}
+	for _, component := range g.Components() {
+		sb.WriteString(`"` + component.ID() + `"` + "\n")
 	}
 
-	sb.WriteString(e.completeGraph())
+	for _, imp := range g.Imports() {
+		sb.WriteString(`"` + imp.From().ID() + `" -> "` + imp.To().ID() + `"` + "\n")
+	}
+
+	sb.WriteString("}")
 
 	return sb.String()
-}
-
-func (*exporter) startGraph() string {
-	return "digraph {\n"
-}
-
-func (*exporter) completeGraph() string {
-	return "}"
-}
-
-func (e *exporter) addPackageInGraph(aPackage *component.Package) string {
-	packageNode := `"` + aPackage.ID() + `"`
-
-	for ns, nsColor := range e.nameSpaceColors {
-		if strings.Contains(aPackage.Namespace(), ns) {
-			packageNode += " [color=black, fillcolor=" + nsColor + ", style=filled]"
-		}
-	}
-
-	return packageNode + "\n"
-}
-
-func (*exporter) addImportInGraph(aPackage *component.Package, importedComponent *component.Component) string {
-	return `"` + aPackage.ID() + `" -> "` + importedComponent.ID() + `"` + "\n"
 }

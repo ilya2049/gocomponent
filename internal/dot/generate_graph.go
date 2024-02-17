@@ -20,15 +20,17 @@ func GenerateGraph() string {
 		return err.Error()
 	}
 
-	if conf.HideThirdPartyImports {
-		project.ExcludeThirdPartyImports()
-	}
-
 	if len(conf.IncludeOnlyNextPackageNamespaces) > 0 {
 		project.IncludeOnlyNextPackageNamespaces(conf.IncludeOnlyNextPackageNamespaces)
 	}
 
+	componentGraph := project.CreateComponentGraph()
+
+	if conf.HideThirdPartyImports {
+		componentGraph = componentGraph.RemoveThirdPartyImports()
+	}
+
 	dotExporter := newExporter(conf.NamespaceColors)
 
-	return dotExporter.export(project.Packages())
+	return dotExporter.export(componentGraph)
 }

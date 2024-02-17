@@ -29,3 +29,5 @@ func (c *Component) ID() string {
 func (c *Component) Namespace() string {
 	return string(c.namespace)
 }
+
+type Components []*Component
