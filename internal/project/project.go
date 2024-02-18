@@ -1,33 +1,35 @@
-package component
+package project
+
+import "github.com/ilya2049/gocomponent/internal/component"
 
 type Project struct {
-	packages map[Namespace]*Package
+	packages map[component.Namespace]*Package
 
-	components map[Namespace]*Component
+	components map[component.Namespace]*component.Component
 }
 
-func NewProject() *Project {
+func New() *Project {
 	return &Project{
-		packages:   make(map[Namespace]*Package),
-		components: make(map[Namespace]*Component),
+		packages:   make(map[component.Namespace]*Package),
+		components: make(map[component.Namespace]*component.Component),
 	}
 }
 
-func (p *Project) GetOrAddComponent(namespace Namespace) *Component {
+func (p *Project) GetOrAddComponent(namespace component.Namespace) *component.Component {
 	existingComponent, ok := p.components[namespace]
 	if ok {
 		return existingComponent
 	}
 
-	newComponent := New(namespace)
+	newComponent := component.New(namespace)
 
 	p.components[namespace] = newComponent
 
 	return newComponent
 }
 
-func (p *Project) Components() Components {
-	var components Components
+func (p *Project) Components() component.Components {
+	var components component.Components
 
 	for _, component := range p.components {
 		components = append(components, component)
@@ -58,13 +60,13 @@ func (p *Project) MakeUniqueComponentIDs() {
 	}
 }
 
-func (p *Project) FindPackage(namespace Namespace) (*Package, bool) {
+func (p *Project) FindPackage(namespace component.Namespace) (*Package, bool) {
 	pkg, ok := p.packages[namespace]
 
 	return pkg, ok
 }
 
-func (p *Project) AddPackage(namespace Namespace, pkg *Package) {
+func (p *Project) AddPackage(namespace component.Namespace, pkg *Package) {
 	p.packages[namespace] = pkg
 }
 
@@ -78,16 +80,16 @@ func (p *Project) Packages() []*Package {
 	return packages
 }
 
-func (p *Project) CreateComponentGraph() *Graph {
-	imports := make(Imports, 0)
+func (p *Project) CreateComponentGraph() *component.Graph {
+	imports := make(component.Imports, 0)
 
 	for _, p := range p.packages {
 		for _, importedComponent := range p.Imports() {
-			imports = append(imports, NewImport(p.Component, importedComponent))
+			imports = append(imports, component.NewImport(p.Component, importedComponent))
 		}
 	}
 
-	g := NewGraph(imports)
+	g := component.NewGraph(imports)
 
 	return g
 }

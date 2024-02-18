@@ -1,15 +1,16 @@
-package component_test
+package project_test
 
 import (
 	"testing"
 
 	"github.com/ilya2049/gocomponent/internal/component"
+	"github.com/ilya2049/gocomponent/internal/project"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestProject_MakeUniqueComponentIDs(t *testing.T) {
-	project := component.NewProject()
+	project := project.New()
 
 	_ = project.GetOrAddComponent(component.NewNamespace("postgresql/repository/user/edit"))
 	_ = project.GetOrAddComponent(component.NewNamespace("domain/user/edit"))

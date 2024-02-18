@@ -1,12 +1,14 @@
-package component
+package project
+
+import "github.com/ilya2049/gocomponent/internal/component"
 
 type Package struct {
-	*Component
+	*component.Component
 
-	imports map[Namespace]*Component
+	imports map[component.Namespace]*component.Component
 }
 
-func NewPackage(c *Component, imports map[Namespace]*Component) *Package {
+func NewPackage(c *component.Component, imports map[component.Namespace]*component.Component) *Package {
 	return &Package{
 		Component: c,
 		imports:   imports,
@@ -19,8 +21,8 @@ func (p *Package) Join(anotherPackage *Package) {
 	}
 }
 
-func (p *Package) Imports() []*Component {
-	var components []*Component
+func (p *Package) Imports() []*component.Component {
+	var components []*component.Component
 
 	for _, component := range p.imports {
 		components = append(components, component)

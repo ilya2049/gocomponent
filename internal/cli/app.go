@@ -3,11 +3,11 @@ package cli
 import (
 	"fmt"
 
-	"github.com/ilya2049/gocomponent/internal/component"
 	"github.com/ilya2049/gocomponent/internal/config"
 	"github.com/ilya2049/gocomponent/internal/dot"
 	"github.com/ilya2049/gocomponent/internal/fs"
 	"github.com/ilya2049/gocomponent/internal/httpserver"
+	"github.com/ilya2049/gocomponent/internal/project"
 
 	"github.com/urfave/cli/v2"
 )
@@ -70,15 +70,15 @@ func printNamespaces(cCtx *cli.Context) error {
 		return err
 	}
 
-	project := component.NewProject()
+	prj := project.New()
 
-	walk := fs.NewWalk(conf.ProjectDirectory, project)
+	walk := fs.NewWalk(conf.ProjectDirectory, prj)
 
 	if err := walk.FindComponentsAndImports(); err != nil {
 		return err
 	}
 
-	for _, pkg := range project.Packages() {
+	for _, pkg := range prj.Packages() {
 		fmt.Println(pkg.Namespace(), "["+pkg.ID()+"]")
 	}
 

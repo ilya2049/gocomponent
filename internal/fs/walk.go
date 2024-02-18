@@ -9,21 +9,22 @@ import (
 	"strings"
 
 	"github.com/ilya2049/gocomponent/internal/component"
+	"github.com/ilya2049/gocomponent/internal/project"
 )
 
 type Walk struct {
 	projectDir string
-	project    *component.Project
+	project    *project.Project
 }
 
-func NewWalk(projectDir string, project *component.Project) *Walk {
+func NewWalk(projectDir string, prj *project.Project) *Walk {
 	if !strings.HasSuffix(projectDir, "/") {
 		projectDir += "/"
 	}
 
 	return &Walk{
 		projectDir: projectDir,
-		project:    project,
+		project:    prj,
 	}
 }
 
@@ -60,7 +61,7 @@ func (w *Walk) FindComponentsAndImports() error {
 			return err
 		}
 
-		aPackage := component.NewPackage(aComponent, packageImports)
+		aPackage := project.NewPackage(aComponent, packageImports)
 
 		w.addPackageInProject(namespace, aPackage)
 
@@ -76,7 +77,7 @@ func (w *Walk) FindComponentsAndImports() error {
 	return nil
 }
 
-func (w *Walk) addPackageInProject(namespace component.Namespace, newPackage *component.Package) {
+func (w *Walk) addPackageInProject(namespace component.Namespace, newPackage *project.Package) {
 	existingPackage, ok := w.project.FindPackage(namespace)
 	if ok {
 		existingPackage.Join(newPackage)

@@ -4,6 +4,7 @@ import (
 	"github.com/ilya2049/gocomponent/internal/component"
 	"github.com/ilya2049/gocomponent/internal/config"
 	"github.com/ilya2049/gocomponent/internal/fs"
+	"github.com/ilya2049/gocomponent/internal/project"
 )
 
 func GenerateGraph() string {
@@ -12,7 +13,7 @@ func GenerateGraph() string {
 		return err.Error()
 	}
 
-	project := component.NewProject()
+	project := project.New()
 
 	walk := fs.NewWalk(conf.ProjectDirectory, project)
 
