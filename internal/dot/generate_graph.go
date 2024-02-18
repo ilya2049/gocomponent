@@ -38,7 +38,11 @@ func GenerateGraph() string {
 		)
 	}
 
-	dotExporter := newExporter(conf.ComponentColors)
+	if len(conf.ComponentColors) > 0 {
+		componentGraph.Colorize(component.NewNamespaceColorMap(conf.ComponentColors))
+	}
+
+	dotExporter := newExporter()
 
 	return dotExporter.export(componentGraph)
 }

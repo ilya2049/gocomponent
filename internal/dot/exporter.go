@@ -7,13 +7,10 @@ import (
 )
 
 type exporter struct {
-	nameSpaceColors map[string]string
 }
 
-func newExporter(nameSpaceColors map[string]string) *exporter {
-	return &exporter{
-		nameSpaceColors: nameSpaceColors,
-	}
+func newExporter() *exporter {
+	return &exporter{}
 }
 
 func (*exporter) export(g *component.Graph) string {
@@ -22,7 +19,16 @@ func (*exporter) export(g *component.Graph) string {
 	sb.WriteString("digraph {\n")
 
 	for _, component := range g.Components() {
-		sb.WriteString(`"` + component.ID() + `"` + " [shape=component]\n")
+		componentString := `"` + component.ID() + `"`
+
+		if component.HasColor() {
+			componentString += " [shape=component, style=filled, fillcolor=" +
+				component.Color().String() + "]\n"
+		} else {
+			componentString += " [shape=component]\n"
+		}
+
+		sb.WriteString(componentString)
 	}
 
 	for _, imp := range g.Imports() {

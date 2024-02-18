@@ -67,3 +67,13 @@ func NewNamespaces(values []string) Namespaces {
 
 	return namespaces
 }
+
+func NewNamespaceColorMap(values map[string]string) map[Namespace]Color {
+	namespaceColorMap := make(map[Namespace]Color)
+
+	for namespaceValue, colorValue := range values {
+		namespaceColorMap[NewNamespace(namespaceValue)] = NewColor(colorValue)
+	}
+
+	return namespaceColorMap
+}

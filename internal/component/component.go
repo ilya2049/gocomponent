@@ -4,6 +4,7 @@ type Component struct {
 	namespace    Namespace
 	id           string
 	isThirdParty bool
+	color        Color
 }
 
 func New(namespace Namespace) *Component {
@@ -11,6 +12,7 @@ func New(namespace Namespace) *Component {
 		namespace:    namespace,
 		id:           "",
 		isThirdParty: false,
+		color:        "",
 	}
 }
 
@@ -28,6 +30,18 @@ func (c *Component) ID() string {
 
 func (c *Component) Namespace() string {
 	return string(c.namespace)
+}
+
+func (c *Component) Colorize(color Color) {
+	c.color = color
+}
+
+func (c *Component) HasColor() bool {
+	return c.color != ""
+}
+
+func (c *Component) Color() Color {
+	return c.color
 }
 
 type Components []*Component

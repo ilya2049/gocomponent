@@ -35,6 +35,18 @@ func (g *Graph) Imports() Imports {
 	return g.imports
 }
 
+func (g *Graph) Colorize(namespaceColorMap map[Namespace]Color) {
+	for _, component := range g.components {
+		for namespace, color := range namespaceColorMap {
+			if component.namespace.Contains(namespace) {
+				component.Colorize(color)
+
+				continue
+			}
+		}
+	}
+}
+
 func (g *Graph) RemoveThirdPartyComponents() *Graph {
 	newImports := make(Imports, 0)
 
