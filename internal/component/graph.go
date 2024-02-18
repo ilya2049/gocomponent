@@ -1,5 +1,10 @@
 package component
 
+import (
+	"fmt"
+	"regexp"
+)
+
 type Graph struct {
 	components map[Namespace]*Component
 
@@ -33,6 +38,47 @@ func (g *Graph) Components() Components {
 
 func (g *Graph) Imports() Imports {
 	return g.imports
+}
+
+func (g *Graph) MakeUniqueComponentIDs() {
+	components := g.Components()
+
+	for len(components) > 0 {
+		firstComponent := components[0]
+		isComponentIDUnique := true
+
+		for i := 1; i < len(components); i++ {
+			if components[i].ID() == firstComponent.ID() {
+				isComponentIDUnique = false
+				components[i].ExtendID()
+			}
+		}
+
+		if isComponentIDUnique {
+			components = components[1:]
+		} else {
+			firstComponent.ExtendID()
+		}
+	}
+}
+
+func (g *Graph) ExtendComponentIDs(idRegexpPatternAndSections map[string]int) {
+	for idRegexpPattern, sections := range idRegexpPatternAndSections {
+		r, err := regexp.Compile(idRegexpPattern)
+		if err != nil {
+			fmt.Printf("extend component ids: %s\n", err.Error())
+
+			continue
+		}
+
+		for _, component := range g.components {
+			if r.MatchString(component.Namespace()) {
+				for i := 0; i < sections; i++ {
+					component.ExtendID()
+				}
+			}
+		}
+	}
 }
 
 func (g *Graph) Colorize(namespaceColorMap map[Namespace]Color) {

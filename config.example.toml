@@ -1,24 +1,30 @@
-project_directory = "./"
+project_directory = './'
 
-include_third_party = false
-third_party_color = ""
+include_third_party = true
+third_party_color = 'orange'
 
 include_parents = [
-    "cli"
+    'fs',
+    'dot'
 ]
 
 include_children = [
-    "component"
+    'fs',
+    'dot'
 ]
 
 exclude_parents = [
-    "cli"
+    'fs',
+    'dot'
 ]
 
 exclude_children = [
-    "component"
+    'fs',
+    'dot'
 ]
 
 [colors]
-"json" = "green"
-"server" = "cyan"
+'dot' = 'red'
+
+[extend_ids]
+'v\d+$' = 2

@@ -72,8 +72,6 @@ func (w *Walk) FindComponentsAndImports() error {
 		return err
 	}
 
-	w.project.MakeUniqueComponentIDs()
-
 	return nil
 }
 

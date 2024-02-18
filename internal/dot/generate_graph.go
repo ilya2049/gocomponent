@@ -59,6 +59,12 @@ func GenerateGraph() string {
 		componentGraph.ColorizeThirdParty(component.NewColor(conf.ThirdPartyComponentsColor))
 	}
 
+	componentGraph.MakeUniqueComponentIDs()
+
+	if len(conf.ExtendComponentIDs) > 0 {
+		componentGraph.ExtendComponentIDs(conf.ExtendComponentIDs)
+	}
+
 	dotExporter := newExporter()
 
 	return dotExporter.export(componentGraph)

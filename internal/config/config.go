@@ -9,6 +9,7 @@ import (
 
 type Config struct {
 	ProjectDirectory            string            `toml:"project_directory"`
+	ExtendComponentIDs          map[string]int    `toml:"extend_ids"`
 	IncludeThirdPartyComponents bool              `toml:"include_third_party"`
 	ThirdPartyComponentsColor   string            `toml:"third_party_color"`
 	IncludeParentComponents     []string          `toml:"include_parents"`
