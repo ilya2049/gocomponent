@@ -10,6 +10,14 @@ include_children = [
     "component"
 ]
 
+exclude_parents = [
+    "cli"
+]
+
+exclude_children = [
+    "component"
+]
+
 [colors]
 "json" = "green"
 "server" = "cyan"

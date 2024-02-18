@@ -59,7 +59,7 @@ func (g *Graph) RemoveThirdPartyComponents() *Graph {
 	return NewGraph(newImports)
 }
 
-func (g *Graph) RemoveParentComponents(namespaces Namespaces) *Graph {
+func (g *Graph) IncludeParentComponents(namespaces Namespaces) *Graph {
 	newImports := make(Imports, 0)
 
 	for _, imp := range g.Imports() {
@@ -75,12 +75,44 @@ func (g *Graph) RemoveParentComponents(namespaces Namespaces) *Graph {
 	return NewGraph(newImports)
 }
 
-func (g *Graph) RemoveChildComponents(namespaces Namespaces) *Graph {
+func (g *Graph) IncludeChildComponents(namespaces Namespaces) *Graph {
 	newImports := make(Imports, 0)
 
 	for _, imp := range g.Imports() {
 		for _, namespace := range namespaces {
 			if imp.to.namespace.Contains(namespace) {
+				newImports = append(newImports, imp)
+
+				continue
+			}
+		}
+	}
+
+	return NewGraph(newImports)
+}
+
+func (g *Graph) ExcludeParentComponents(namespaces Namespaces) *Graph {
+	newImports := make(Imports, 0)
+
+	for _, imp := range g.Imports() {
+		for _, namespace := range namespaces {
+			if !imp.from.namespace.Contains(namespace) {
+				newImports = append(newImports, imp)
+
+				continue
+			}
+		}
+	}
+
+	return NewGraph(newImports)
+}
+
+func (g *Graph) ExcludeChildComponents(namespaces Namespaces) *Graph {
+	newImports := make(Imports, 0)
+
+	for _, imp := range g.Imports() {
+		for _, namespace := range namespaces {
+			if !imp.to.namespace.Contains(namespace) {
 				newImports = append(newImports, imp)
 
 				continue

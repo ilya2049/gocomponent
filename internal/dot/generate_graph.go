@@ -28,14 +28,26 @@ func GenerateGraph() string {
 	}
 
 	if len(conf.IncludeParentComponents) > 0 {
-		componentGraph = componentGraph.RemoveParentComponents(
+		componentGraph = componentGraph.IncludeParentComponents(
 			component.NewNamespaces(conf.IncludeParentComponents),
 		)
 	}
 
 	if len(conf.IncludeChildComponents) > 0 {
-		componentGraph = componentGraph.RemoveChildComponents(
+		componentGraph = componentGraph.IncludeChildComponents(
 			component.NewNamespaces(conf.IncludeChildComponents),
+		)
+	}
+
+	if len(conf.ExcludeParentComponents) > 0 {
+		componentGraph = componentGraph.ExcludeParentComponents(
+			component.NewNamespaces(conf.ExcludeParentComponents),
+		)
+	}
+
+	if len(conf.ExcludeChildComponents) > 0 {
+		componentGraph = componentGraph.ExcludeChildComponents(
+			component.NewNamespaces(conf.ExcludeChildComponents),
 		)
 	}
 

@@ -12,6 +12,8 @@ type Config struct {
 	IncludeThirdPartyComponents bool              `toml:"include_third_party"`
 	IncludeParentComponents     []string          `toml:"include_parents"`
 	IncludeChildComponents      []string          `toml:"include_children"`
+	ExcludeParentComponents     []string          `toml:"exclude_parents"`
+	ExcludeChildComponents      []string          `toml:"exclude_children"`
 	ComponentColors             map[string]string `toml:"colors"`
 }
 
