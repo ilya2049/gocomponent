@@ -55,6 +55,10 @@ func GenerateGraph() string {
 		componentGraph.Colorize(component.NewNamespaceColorMap(conf.ComponentColors))
 	}
 
+	if conf.ThirdPartyComponentsColor != "" {
+		componentGraph.ColorizeThirdParty(component.NewColor(conf.ThirdPartyComponentsColor))
+	}
+
 	dotExporter := newExporter()
 
 	return dotExporter.export(componentGraph)

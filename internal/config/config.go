@@ -10,6 +10,7 @@ import (
 type Config struct {
 	ProjectDirectory            string            `toml:"project_directory"`
 	IncludeThirdPartyComponents bool              `toml:"include_third_party"`
+	ThirdPartyComponentsColor   string            `toml:"third_party_color"`
 	IncludeParentComponents     []string          `toml:"include_parents"`
 	IncludeChildComponents      []string          `toml:"include_children"`
 	ExcludeParentComponents     []string          `toml:"exclude_parents"`

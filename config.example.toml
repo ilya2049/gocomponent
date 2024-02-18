@@ -1,6 +1,7 @@
 project_directory = "./"
 
 include_third_party = false
+third_party_color = ""
 
 include_parents = [
     "cli"
