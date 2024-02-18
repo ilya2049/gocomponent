@@ -1,11 +1,15 @@
 project_directory = "./"
 
-include_third_party_components = false
+include_third_party = false
 
-include_only_next_package_namespaces = [
-    "internal"
+include_parents = [
+    "cli"
 ]
 
-[namespace_colors]
+include_children = [
+    "component"
+]
+
+[colors]
 "json" = "green"
 "server" = "cyan"

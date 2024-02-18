@@ -55,3 +55,15 @@ func (ns Namespace) HasPrefix(prefix string) bool {
 func (ns Namespace) TrimPrefix(prefix string) Namespace {
 	return Namespace(strings.TrimPrefix(string(ns), prefix))
 }
+
+type Namespaces []Namespace
+
+func NewNamespaces(values []string) Namespaces {
+	namespaces := make(Namespaces, 0, len(values))
+
+	for _, value := range values {
+		namespaces = append(namespaces, NewNamespace(value))
+	}
+
+	return namespaces
+}

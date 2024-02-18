@@ -8,10 +8,11 @@ import (
 )
 
 type Config struct {
-	ProjectDirectory                 string            `toml:"project_directory"`
-	IncludeThirdPartyComponents      bool              `toml:"include_third_party_components"`
-	IncludeOnlyNextPackageNamespaces []string          `toml:"include_only_next_package_namespaces"`
-	NamespaceColors                  map[string]string `toml:"namespace_colors"`
+	ProjectDirectory            string            `toml:"project_directory"`
+	IncludeThirdPartyComponents bool              `toml:"include_third_party"`
+	IncludeParentComponents     []string          `toml:"include_parents"`
+	IncludeChildComponents      []string          `toml:"include_children"`
+	ComponentColors             map[string]string `toml:"colors"`
 }
 
 func Read() (*Config, error) {
