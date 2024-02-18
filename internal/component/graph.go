@@ -1,19 +1,34 @@
 package component
 
 type Graph struct {
-	components Components
-	imports    Imports
+	componentsMap map[Namespace]*Component
+
+	imports Imports
 }
 
-func NewGraph(components Components, imports Imports) *Graph {
+func NewGraph(imports Imports) *Graph {
+	componentsMap := make(map[Namespace]*Component)
+
+	for _, imp := range imports {
+		componentsMap[imp.from.namespace] = imp.from
+		componentsMap[imp.to.namespace] = imp.to
+	}
+
 	return &Graph{
-		components: components,
-		imports:    imports,
+		componentsMap: componentsMap,
+
+		imports: imports,
 	}
 }
 
 func (g *Graph) Components() Components {
-	return g.components
+	components := make(Components, 0, len(g.componentsMap))
+
+	for _, component := range g.componentsMap {
+		components = append(components, component)
+	}
+
+	return components
 }
 
 func (g *Graph) Imports() Imports {
@@ -21,14 +36,6 @@ func (g *Graph) Imports() Imports {
 }
 
 func (g *Graph) RemoveThirdPartyComponents() *Graph {
-	newComponents := make(Components, 0)
-
-	for _, component := range g.Components() {
-		if !component.isThirdParty {
-			newComponents = append(newComponents, component)
-		}
-	}
-
 	newImports := make(Imports, 0)
 
 	for _, imp := range g.Imports() {
@@ -37,5 +44,5 @@ func (g *Graph) RemoveThirdPartyComponents() *Graph {
 		}
 	}
 
-	return NewGraph(newComponents, newImports)
+	return NewGraph(newImports)
 }

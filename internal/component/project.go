@@ -101,7 +101,7 @@ func (p *Project) CreateComponentGraph() *Graph {
 		}
 	}
 
-	g := NewGraph(p.Components(), imports)
+	g := NewGraph(imports)
 
 	return g
 }
