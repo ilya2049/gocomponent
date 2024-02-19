@@ -16,6 +16,7 @@ type Config struct {
 	IncludeChildComponents      []string          `toml:"include_children"`
 	ExcludeParentComponents     []string          `toml:"exclude_parents"`
 	ExcludeChildComponents      []string          `toml:"exclude_children"`
+	CustomComponents            []string          `toml:"custom"`
 	ComponentColors             map[string]string `toml:"colors"`
 }
 

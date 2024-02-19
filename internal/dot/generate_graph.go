@@ -27,6 +27,12 @@ func GenerateGraph() string {
 		componentGraph = componentGraph.RemoveThirdPartyComponents()
 	}
 
+	if len(conf.CustomComponents) > 0 {
+		componentGraph = componentGraph.CreateCustomComponents(
+			component.NewNamespaces(conf.CustomComponents),
+		)
+	}
+
 	if len(conf.IncludeParentComponents) > 0 {
 		componentGraph = componentGraph.IncludeParentComponents(
 			component.NewNamespaces(conf.IncludeParentComponents),

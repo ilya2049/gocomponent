@@ -78,8 +78,10 @@ func printNamespaces(cCtx *cli.Context) error {
 		return err
 	}
 
-	for _, pkg := range prj.Packages() {
-		fmt.Println(pkg.Namespace(), "["+pkg.ID()+"]")
+	componentGraph := prj.CreateComponentGraph()
+
+	for _, component := range componentGraph.Components() {
+		fmt.Println(component.Namespace(), "["+component.ID()+"]")
 	}
 
 	return nil

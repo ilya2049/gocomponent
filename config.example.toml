@@ -23,6 +23,10 @@ exclude_children = [
     'dot'
 ]
 
+custom = [
+    'domain'
+]
+
 [colors]
 'dot' = 'red'
 

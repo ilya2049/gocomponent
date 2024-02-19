@@ -176,3 +176,52 @@ func (g *Graph) ExcludeChildComponents(namespaces Namespaces) *Graph {
 
 	return NewGraph(newImports)
 }
+
+func (g *Graph) CreateCustomComponents(namespaces Namespaces) *Graph {
+	newGraph := g
+
+	for _, namespace := range namespaces {
+		newGraph = newGraph.createCustomComponent(namespace)
+	}
+
+	return newGraph
+}
+
+func (g *Graph) createCustomComponent(namespace Namespace) *Graph {
+	childrenOfCustomComponent := make(map[Namespace]*Component)
+	parentsOfCustomComponent := make(map[Namespace]*Component)
+
+	newImports := make(Imports, 0)
+
+	for _, imp := range g.imports {
+		if imp.from.namespace.Contains(namespace) && imp.to.namespace.Contains(namespace) {
+			continue
+		}
+
+		if imp.from.namespace.Contains(namespace) {
+			childrenOfCustomComponent[imp.to.namespace] = imp.to
+
+			continue
+		}
+
+		if imp.to.namespace.Contains(namespace) {
+			parentsOfCustomComponent[imp.from.namespace] = imp.from
+
+			continue
+		}
+
+		newImports = append(newImports, imp)
+	}
+
+	customComponent := New(namespace)
+
+	for _, childOfCustomComponent := range childrenOfCustomComponent {
+		newImports = append(newImports, NewImport(customComponent, childOfCustomComponent))
+	}
+
+	for _, parentOfCustomComponent := range parentsOfCustomComponent {
+		newImports = append(newImports, NewImport(parentOfCustomComponent, customComponent))
+	}
+
+	return NewGraph(newImports)
+}
