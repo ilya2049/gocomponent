@@ -6,14 +6,7 @@ import (
 	"github.com/ilya2049/gocomponent/internal/component"
 )
 
-type exporter struct {
-}
-
-func newExporter() *exporter {
-	return &exporter{}
-}
-
-func (*exporter) export(g *component.Graph) string {
+func Export(g *component.Graph) string {
 	sb := strings.Builder{}
 
 	sb.WriteString("digraph {\n")

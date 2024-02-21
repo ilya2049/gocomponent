@@ -3,11 +3,9 @@ package cli
 import (
 	"fmt"
 
-	"github.com/ilya2049/gocomponent/internal/config"
 	"github.com/ilya2049/gocomponent/internal/dot"
-	"github.com/ilya2049/gocomponent/internal/fs"
+	"github.com/ilya2049/gocomponent/internal/generator"
 	"github.com/ilya2049/gocomponent/internal/httpserver"
-	"github.com/ilya2049/gocomponent/internal/project"
 
 	"github.com/urfave/cli/v2"
 )
@@ -57,29 +55,21 @@ func runHTTPServer(cCtx *cli.Context) error {
 }
 
 func printDotGraph(cCtx *cli.Context) error {
-	graph := dot.GenerateGraph()
+	componentGraph, err := generator.GenerateGraph()
+	if err != nil {
+		return err
+	}
 
-	fmt.Println(graph)
+	fmt.Println(dot.Export(componentGraph))
 
 	return nil
 }
 
 func printNamespaces(cCtx *cli.Context) error {
-	conf, err := config.Read()
+	componentGraph, err := generator.GenerateGraph()
 	if err != nil {
 		return err
 	}
-
-	prj := project.New()
-
-	walk := fs.NewWalk(conf.ProjectDirectory, prj)
-
-	if err := walk.FindComponentsAndImports(); err != nil {
-		return err
-	}
-
-	componentGraph := prj.CreateComponentGraph()
-	componentGraph.MakeUniqueComponentIDs()
 
 	for _, component := range componentGraph.Components() {
 		fmt.Println(component.Namespace(), "["+component.ID()+"]")

@@ -6,6 +6,7 @@ import (
 
 	"github.com/goccy/go-graphviz"
 	"github.com/ilya2049/gocomponent/internal/dot"
+	"github.com/ilya2049/gocomponent/internal/generator"
 )
 
 func New(address string) *http.Server {
@@ -16,9 +17,20 @@ func New(address string) *http.Server {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		parsedDotGraph, err := graphviz.ParseBytes([]byte(dot.GenerateGraph()))
+		componentGraph, err := generator.GenerateGraph()
 		if err != nil {
 			w.Write([]byte(err.Error()))
+
+			return
+		}
+
+		dotGraph := dot.Export(componentGraph)
+
+		parsedDotGraph, err := graphviz.ParseBytes([]byte(dotGraph))
+		if err != nil {
+			w.Write([]byte(err.Error()))
+
+			return
 		}
 
 		var svgGraph bytes.Buffer
@@ -26,6 +38,8 @@ func New(address string) *http.Server {
 		graph := graphviz.New()
 		if err := graph.Render(parsedDotGraph, graphviz.SVG, &svgGraph); err != nil {
 			w.Write([]byte(err.Error()))
+
+			return
 		}
 
 		w.Write(svgGraph.Bytes())

@@ -1,4 +1,4 @@
-package dot
+package generator
 
 import (
 	"github.com/ilya2049/gocomponent/internal/component"
@@ -7,10 +7,10 @@ import (
 	"github.com/ilya2049/gocomponent/internal/project"
 )
 
-func GenerateGraph() string {
+func GenerateGraph() (*component.Graph, error) {
 	conf, err := config.Read()
 	if err != nil {
-		return err.Error()
+		return nil, err
 	}
 
 	project := project.New()
@@ -18,7 +18,7 @@ func GenerateGraph() string {
 	walk := fs.NewWalk(conf.ProjectDirectory, project)
 
 	if err := walk.FindComponentsAndImports(); err != nil {
-		return err.Error()
+		return nil, err
 	}
 
 	componentGraph := project.CreateComponentGraph()
@@ -71,7 +71,5 @@ func GenerateGraph() string {
 		componentGraph.ExtendComponentIDs(conf.ExtendComponentIDs)
 	}
 
-	dotExporter := newExporter()
-
-	return dotExporter.export(componentGraph)
+	return componentGraph, nil
 }
