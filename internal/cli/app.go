@@ -72,7 +72,12 @@ func printNamespaces(cCtx *cli.Context) error {
 	}
 
 	for _, component := range componentGraph.Components() {
-		fmt.Println(component.Namespace(), "["+component.ID()+"]")
+		var thirdParty string
+		if component.IsThirdParty() {
+			thirdParty = "*"
+		}
+
+		fmt.Println(component.Namespace(), "["+thirdParty+component.ID()+"]")
 	}
 
 	return nil
