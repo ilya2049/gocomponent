@@ -10,16 +10,6 @@ func NewNamespace(value string) Namespace {
 	return Namespace(value)
 }
 
-func (ns Namespace) ExcludeLastSection() string {
-	sections := strings.Split(string(ns), SectionSeparator)
-
-	if len(sections) == 1 {
-		return ""
-	}
-
-	return strings.Join(sections[:len(sections)-1], SectionSeparator) + SectionSeparator
-}
-
 func (ns Namespace) LastSection() string {
 	sections := strings.Split(string(ns), SectionSeparator)
 
@@ -30,18 +20,20 @@ func (ns Namespace) LastSection() string {
 	return sections[len(sections)-1]
 }
 
-func (ns Namespace) ExtendComponentID(sections string) string {
-	if string(ns) == sections {
-		return sections
+func (ns Namespace) ExtendComponentID(componentIDSections string) string {
+	if string(ns) == componentIDSections {
+		return componentIDSections
 	}
 
-	extendedSections := Namespace(strings.TrimSuffix(string(ns), SectionSeparator+sections)).LastSection()
+	namespaceSectionsWithoutComponentIDSections := strings.TrimSuffix(string(ns), SectionSeparator+componentIDSections)
 
-	if sections != "" {
-		extendedSections += SectionSeparator + sections
+	sectionToExtend := Namespace(namespaceSectionsWithoutComponentIDSections).LastSection()
+
+	if componentIDSections != "" {
+		sectionToExtend += SectionSeparator + componentIDSections
 	}
 
-	return extendedSections
+	return sectionToExtend
 }
 
 func (ns Namespace) Contains(another Namespace) bool {

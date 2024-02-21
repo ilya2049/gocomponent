@@ -48,7 +48,7 @@ func (w *Walk) FindComponentsAndImports() error {
 			return nil
 		}
 
-		namespace = namespace.TrimPrefix(w.projectDir)
+		namespace = "/" + namespace.TrimPrefix(w.projectDir)
 
 		if namespace+"/" == component.Namespace(w.projectDir) {
 			namespace = component.NewNamespace(moduleName)
@@ -106,7 +106,7 @@ func (w *Walk) parseImportsOfGoFile(
 		moduleNameWithSlash := moduleName + "/"
 
 		if namespace.HasPrefix(moduleNameWithSlash) {
-			namespace = namespace.TrimPrefix(moduleNameWithSlash)
+			namespace = namespace.TrimPrefix(moduleName)
 			isComponentInProject = true
 		}
 
