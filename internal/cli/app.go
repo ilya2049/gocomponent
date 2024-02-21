@@ -79,6 +79,7 @@ func printNamespaces(cCtx *cli.Context) error {
 	}
 
 	componentGraph := prj.CreateComponentGraph()
+	componentGraph.MakeUniqueComponentIDs()
 
 	for _, component := range componentGraph.Components() {
 		fmt.Println(component.Namespace(), "["+component.ID()+"]")
