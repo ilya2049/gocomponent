@@ -25,6 +25,10 @@ func (ns Namespace) ExtendComponentID(componentIDSections string) string {
 		return componentIDSections
 	}
 
+	if string(ns) == SectionSeparator {
+		return SectionSeparator
+	}
+
 	namespaceSectionsWithoutComponentIDSections := strings.TrimSuffix(string(ns), SectionSeparator+componentIDSections)
 
 	sectionToExtend := Namespace(namespaceSectionsWithoutComponentIDSections).LastSection()

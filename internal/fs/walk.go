@@ -18,8 +18,8 @@ type Walk struct {
 }
 
 func NewWalk(projectDir string, prj *project.Project) *Walk {
-	if !strings.HasSuffix(projectDir, "/") {
-		projectDir += "/"
+	if !strings.HasSuffix(projectDir, component.SectionSeparator) {
+		projectDir += component.SectionSeparator
 	}
 
 	return &Walk{
@@ -48,10 +48,10 @@ func (w *Walk) FindComponentsAndImports() error {
 			return nil
 		}
 
-		namespace = "/" + namespace.TrimPrefix(w.projectDir)
-
-		if namespace+"/" == component.Namespace(w.projectDir) {
-			namespace = component.NewNamespace(moduleName)
+		if w.isRootNamespace(namespace) {
+			namespace = component.NewNamespace(component.SectionSeparator)
+		} else {
+			namespace = component.SectionSeparator + namespace.TrimPrefix(w.projectDir)
 		}
 
 		aComponent := w.project.GetOrAddComponent(namespace)
@@ -73,6 +73,10 @@ func (w *Walk) FindComponentsAndImports() error {
 	}
 
 	return nil
+}
+
+func (w *Walk) isRootNamespace(namespace component.Namespace) bool {
+	return namespace+component.SectionSeparator == component.Namespace(w.projectDir)
 }
 
 func (w *Walk) addPackageInProject(namespace component.Namespace, newPackage *project.Package) {
@@ -103,9 +107,9 @@ func (w *Walk) parseImportsOfGoFile(
 
 		var isComponentInProject bool
 
-		moduleNameWithSlash := moduleName + "/"
+		moduleNameWithSectionSeparator := moduleName + component.SectionSeparator
 
-		if namespace.HasPrefix(moduleNameWithSlash) {
+		if namespace.HasPrefix(moduleNameWithSectionSeparator) {
 			namespace = namespace.TrimPrefix(moduleName)
 			isComponentInProject = true
 		}

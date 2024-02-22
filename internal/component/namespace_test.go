@@ -51,7 +51,13 @@ func TestNamespace_ExtendComponentID(t *testing.T) {
 		want                string
 	}{
 		{
-			name:                "There are not sections in a component id yet",
+			name:                "There is on section, just the root",
+			namespace:           "/",
+			componentIDSections: "",
+			want:                "/",
+		},
+		{
+			name:                "There are no sections in a component id yet",
 			namespace:           "/internal/postgresql/connection",
 			componentIDSections: "",
 			want:                "connection",
