@@ -45,27 +45,69 @@ func TestGraph_MakeUniqueComponentIDs(t *testing.T) {
 }
 
 func TestGraph_CreateCustomComponents(t *testing.T) {
-	main := component.New(component.NewNamespace("/cmd/main"))
-	pgUser := component.New(component.NewNamespace("/postgresql/user"))
-	domainUser := component.New(component.NewNamespace("/domain/user"))
-	pkg := component.New(component.NewNamespace("/pkg"))
+	tests := []struct {
+		name             string
+		newGraph         func() *component.Graph
+		customComponents []string
+		wantGraphString  string
+	}{
+		{
+			name: "Create a section-marker custom component",
+			newGraph: func() *component.Graph {
+				main := component.New(component.NewNamespace("/cmd/main"))
+				pgUser := component.New(component.NewNamespace("/postgresql/user"))
+				domainUser := component.New(component.NewNamespace("/domain/user"))
+				pkg := component.New(component.NewNamespace("/pkg"))
 
-	g := component.NewGraph(component.Imports{
-		component.NewImport(main, pgUser),
-		component.NewImport(main, domainUser),
-		component.NewImport(pgUser, domainUser),
-		component.NewImport(pgUser, pkg),
-		component.NewImport(domainUser, pkg),
-	})
+				return component.NewGraph(component.Imports{
+					component.NewImport(main, pgUser),
+					component.NewImport(main, domainUser),
+					component.NewImport(pgUser, domainUser),
+					component.NewImport(pgUser, pkg),
+					component.NewImport(domainUser, pkg),
+				})
+			},
+			customComponents: []string{"user"},
+			wantGraphString: testutil.BuildGraphString(
+				"user -> /pkg",
+				"/cmd/main -> user",
+			),
+		},
+		{
+			name: "Create a root-based custom component",
+			newGraph: func() *component.Graph {
+				main := component.New(component.NewNamespace("/cmd/main"))
+				pgUser := component.New(component.NewNamespace("/postgresql/user"))
+				pgProduct := component.New(component.NewNamespace("/postgresql/product"))
+				pkg := component.New(component.NewNamespace("/pkg"))
 
-	g = g.CreateCustomComponents(component.NewNamespaces([]string{"user"}))
+				return component.NewGraph(component.Imports{
+					component.NewImport(main, pgUser),
+					component.NewImport(main, pgProduct),
+					component.NewImport(pgUser, pgProduct),
+					component.NewImport(pgProduct, pkg),
+					component.NewImport(pgUser, pkg),
+				})
+			},
+			customComponents: []string{"/postgresql"},
+			wantGraphString: testutil.BuildGraphString(
+				"/postgresql -> /pkg",
+				"/cmd/main -> /postgresql",
+			),
+		},
+	}
 
-	want := testutil.BuildGraphString(
-		"user -> /pkg",
-		"/cmd/main -> user",
-	)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			graph := tt.newGraph()
 
-	assert.Equal(t, want, g.String())
+			graphWithCustomComponents := graph.CreateCustomComponents(
+				component.NewNamespaces(tt.customComponents),
+			)
+
+			assert.Equal(t, tt.wantGraphString, graphWithCustomComponents.String())
+		})
+	}
 }
 
 func TestGraph_String(t *testing.T) {
