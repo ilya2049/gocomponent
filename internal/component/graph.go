@@ -72,7 +72,7 @@ func (g *Graph) ExtendComponentIDs(idRegexpPatternAndSections map[string]int) {
 		}
 
 		for _, component := range g.components {
-			if r.MatchString(component.Namespace()) {
+			if r.MatchString(component.Namespace().String()) {
 				for i := 0; i < sections; i++ {
 					component.ExtendID()
 				}

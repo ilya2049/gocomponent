@@ -48,6 +48,10 @@ func (ns Namespace) HasPrefix(prefix string) bool {
 	return strings.HasPrefix(string(ns), prefix)
 }
 
+func (ns Namespace) String() string {
+	return string(ns)
+}
+
 func (ns Namespace) TrimPrefix(prefix string) Namespace {
 	return Namespace(strings.TrimPrefix(string(ns), prefix))
 }

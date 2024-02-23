@@ -6,13 +6,13 @@ import (
 	"github.com/ilya2049/gocomponent/internal/component"
 )
 
-func MapComponentAndNamespace(components component.Components, svgBytes []byte) []byte {
+func MapComponentAndNamespaceInSVG(components component.Components, svgBytes []byte) []byte {
 	svgString := string(svgBytes)
 
 	for _, aComponent := range components {
 		svgString = strings.Replace(svgString,
 			"<title>"+aComponent.ID()+"</title>",
-			"<title>"+aComponent.Namespace()+"</title>",
+			"<title>"+aComponent.Namespace().String()+"</title>",
 			1,
 		)
 	}

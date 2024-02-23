@@ -42,7 +42,7 @@ func New(address string) *http.Server {
 			return
 		}
 
-		w.Write(dot.MapComponentAndNamespace(componentGraph.Components(), svgGraph.Bytes()))
+		w.Write(dot.MapComponentAndNamespaceInSVG(componentGraph.Components(), svgGraph.Bytes()))
 	})
 
 	server.Handler = mux
