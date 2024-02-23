@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/ilya2049/gocomponent/internal/component"
+	"github.com/ilya2049/gocomponent/internal/component/testutil"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -41,4 +42,53 @@ func TestGraph_MakeUniqueComponentIDs(t *testing.T) {
 	}
 
 	assert.ElementsMatch(t, want, uniqueIDs)
+}
+
+func TestGraph_CreateCustomComponents(t *testing.T) {
+	main := component.New(component.NewNamespace("/cmd/main"))
+	pgUser := component.New(component.NewNamespace("/postgresql/user"))
+	domainUser := component.New(component.NewNamespace("/domain/user"))
+	pkg := component.New(component.NewNamespace("/pkg"))
+
+	g := component.NewGraph(component.Imports{
+		component.NewImport(main, pgUser),
+		component.NewImport(main, domainUser),
+		component.NewImport(pgUser, domainUser),
+		component.NewImport(pgUser, pkg),
+		component.NewImport(domainUser, pkg),
+	})
+
+	g = g.CreateCustomComponents(component.NewNamespaces([]string{"user"}))
+
+	want := testutil.BuildGraphString(
+		"user -> /pkg",
+		"/cmd/main -> user",
+	)
+
+	assert.Equal(t, want, g.String())
+}
+
+func TestGraph_String(t *testing.T) {
+	main := component.New(component.NewNamespace("/cmd/main"))
+	pgUser := component.New(component.NewNamespace("/postgresql/user"))
+	domainUser := component.New(component.NewNamespace("/domain/user"))
+	pkg := component.New(component.NewNamespace("/pkg"))
+
+	g := component.NewGraph(component.Imports{
+		component.NewImport(main, pgUser),
+		component.NewImport(main, domainUser),
+		component.NewImport(pgUser, domainUser),
+		component.NewImport(pgUser, pkg),
+		component.NewImport(domainUser, pkg),
+	})
+
+	want := testutil.BuildGraphString(
+		"/cmd/main -> /postgresql/user",
+		"/cmd/main -> /domain/user",
+		"/postgresql/user -> /domain/user",
+		"/postgresql/user -> /pkg",
+		"/domain/user -> /pkg",
+	)
+
+	assert.Equal(t, want, g.String())
 }

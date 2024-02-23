@@ -2,7 +2,7 @@ package component
 
 import "strings"
 
-const SectionSeparator = "/"
+const Slash = "/"
 
 type Namespace string
 
@@ -11,7 +11,7 @@ func NewNamespace(value string) Namespace {
 }
 
 func (ns Namespace) LastSection() string {
-	sections := strings.Split(string(ns), SectionSeparator)
+	sections := strings.Split(ns.String(), Slash)
 
 	if len(sections) == 1 {
 		return sections[0]
@@ -21,31 +21,35 @@ func (ns Namespace) LastSection() string {
 }
 
 func (ns Namespace) ExtendComponentID(componentIDSections string) string {
-	if string(ns) == componentIDSections {
+	if ns.String() == componentIDSections {
 		return componentIDSections
 	}
 
-	if string(ns) == SectionSeparator {
-		return SectionSeparator
+	if ns.String() == Slash {
+		return Slash
 	}
 
-	namespaceSectionsWithoutComponentIDSections := strings.TrimSuffix(string(ns), SectionSeparator+componentIDSections)
+	namespaceSectionsWithoutComponentIDSections := strings.TrimSuffix(ns.String(), Slash+componentIDSections)
 
 	sectionToExtend := Namespace(namespaceSectionsWithoutComponentIDSections).LastSection()
 
 	if componentIDSections != "" {
-		sectionToExtend += SectionSeparator + componentIDSections
+		sectionToExtend += Slash + componentIDSections
 	}
 
 	return sectionToExtend
 }
 
 func (ns Namespace) Contains(another Namespace) bool {
-	return strings.Contains(string(ns), string(another))
+	if strings.HasPrefix(another.String(), Slash) {
+		return strings.HasPrefix(ns.String(), another.String())
+	}
+
+	return strings.Contains(ns.String(), another.String())
 }
 
 func (ns Namespace) HasPrefix(prefix string) bool {
-	return strings.HasPrefix(string(ns), prefix)
+	return strings.HasPrefix(ns.String(), prefix)
 }
 
 func (ns Namespace) String() string {
@@ -53,7 +57,7 @@ func (ns Namespace) String() string {
 }
 
 func (ns Namespace) TrimPrefix(prefix string) Namespace {
-	return Namespace(strings.TrimPrefix(string(ns), prefix))
+	return Namespace(strings.TrimPrefix(ns.String(), prefix))
 }
 
 type Namespaces []Namespace

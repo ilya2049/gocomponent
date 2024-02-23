@@ -3,6 +3,7 @@ package component
 import (
 	"fmt"
 	"regexp"
+	"strings"
 )
 
 type Graph struct {
@@ -224,4 +225,14 @@ func (g *Graph) createCustomComponent(namespace Namespace) *Graph {
 	}
 
 	return NewGraph(newImports)
+}
+
+func (g *Graph) String() string {
+	sb := strings.Builder{}
+
+	for _, imp := range g.Imports() {
+		sb.WriteString(imp.From().Namespace().String() + " -> " + imp.To().Namespace().String() + "\n")
+	}
+
+	return sb.String()
 }
