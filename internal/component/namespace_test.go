@@ -72,13 +72,19 @@ func TestNamespace_ExtendComponentID(t *testing.T) {
 			name:                "There are two sections in a component id",
 			namespace:           "/internal/postgresql/connection",
 			componentIDSections: "postgresql/connection",
-			want:                "internal/postgresql/connection",
+			want:                "/internal/postgresql/connection",
 		},
 		{
 			name:                "A component id cannot be extended",
 			namespace:           "/internal/postgresql/connection",
-			componentIDSections: "internal/postgresql/connection",
+			componentIDSections: "/internal/postgresql/connection",
 			want:                "/internal/postgresql/connection",
+		},
+		{
+			name:                "When a section is before the root, then the root is included in an id",
+			namespace:           "/internal",
+			componentIDSections: "",
+			want:                "/internal",
 		},
 	}
 

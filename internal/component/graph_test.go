@@ -9,39 +9,63 @@ import (
 )
 
 func TestGraph_MakeUniqueComponentIDs(t *testing.T) {
-	component1 := component.New(component.NewNamespace("/postgresql/repository/user/edit"))
-	component2 := component.New(component.NewNamespace("/domain/user/edit"))
-	component3 := component.New(component.NewNamespace("/domain/product/edit"))
-	component4 := component.New(component.NewNamespace("/pkg"))      // is not a section-marker
-	component5 := component.New(component.NewNamespace("pkg"))       // a section-marker
-	component6 := component.New(component.NewNamespace("/internal")) // already unique
+	tests := []struct {
+		name             string
+		newGraph         func() *component.Graph
+		wantComponentIDs []string
+	}{
+		{
+			name: "Many components",
+			newGraph: func() *component.Graph {
+				component1 := component.New(component.NewNamespace("/postgresql/repository/user/edit"))
+				component2 := component.New(component.NewNamespace("/domain/user/edit"))
+				component3 := component.New(component.NewNamespace("/domain/product/edit"))
+				component4 := component.New(component.NewNamespace("/internal")) // already unique
 
-	g := component.NewGraph(component.Imports{
-		component.NewImport(component1, component2),
-		component.NewImport(component2, component3),
-		component.NewImport(component3, component4),
-		component.NewImport(component4, component5),
-		component.NewImport(component5, component6),
-	})
+				return component.NewGraph(component.Imports{
+					component.NewImport(component1, component2),
+					component.NewImport(component2, component3),
+					component.NewImport(component3, component4),
+				})
+			},
+			wantComponentIDs: []string{
+				"repository/user/edit",
+				"/domain/user/edit",
+				"product/edit",
+				"/internal",
+			},
+		},
+		{
+			name: "When a section is before the root, then the root is included in an id",
+			newGraph: func() *component.Graph {
+				component1 := component.New(component.NewNamespace("/postgresql/repository/user"))
+				component2 := component.New(component.NewNamespace("/pkg"))
 
-	g.MakeUniqueComponentIDs()
-
-	var uniqueIDs []string
-
-	for _, c := range g.Components() {
-		uniqueIDs = append(uniqueIDs, c.ID())
+				return component.NewGraph(component.Imports{
+					component.NewImport(component1, component2),
+				})
+			},
+			wantComponentIDs: []string{
+				"user",
+				"/pkg",
+			},
+		},
 	}
 
-	want := []string{
-		"repository/user/edit",
-		"domain/user/edit",
-		"product/edit",
-		"/pkg",
-		"pkg",
-		"internal",
-	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Given
+			g := tt.newGraph()
 
-	assert.ElementsMatch(t, want, uniqueIDs)
+			// When
+			g.MakeUniqueComponentIDs()
+
+			// Then
+			componentIDs := testutil.GetComponentIDs(g)
+
+			assert.ElementsMatch(t, tt.wantComponentIDs, componentIDs)
+		})
+	}
 }
 
 func TestGraph_CreateCustomComponents(t *testing.T) {
@@ -172,6 +196,51 @@ func TestGraph_String(t *testing.T) {
 			graphString := tt.newGraph().String()
 
 			assert.Equal(t, tt.wantGraphString, graphString)
+		})
+	}
+}
+
+func TestGraph_ExtendComponentIDs(t *testing.T) {
+	tests := []struct {
+		name                       string
+		newGraph                   func() *component.Graph
+		idRegexpPatternAndSections map[string]int
+		wantComponentIDs           []string
+	}{
+		{
+			name: "Extend version-component id",
+			newGraph: func() *component.Graph {
+				component1 := component.New(component.NewNamespace("/internal"))
+				component2 := component.New(component.NewNamespace("github.com/user/lib/v5"))
+
+				return component.NewGraph(component.Imports{
+					component.NewImport(component1, component2),
+				})
+			},
+			idRegexpPatternAndSections: map[string]int{
+				`v\d+$`: 2, // add two extra sections in a unique component id 'v5'
+			},
+			wantComponentIDs: []string{
+				"/internal",
+				"user/lib/v5",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Given
+			g := tt.newGraph()
+
+			g.MakeUniqueComponentIDs()
+
+			// When
+			g.ExtendComponentIDs(tt.idRegexpPatternAndSections)
+
+			// Then
+			componentIDs := testutil.GetComponentIDs(g)
+
+			assert.ElementsMatch(t, tt.wantComponentIDs, componentIDs)
 		})
 	}
 }

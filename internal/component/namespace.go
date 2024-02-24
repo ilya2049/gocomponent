@@ -37,6 +37,10 @@ func (ns Namespace) ExtendComponentID(componentIDSections string) string {
 		sectionToExtend += Slash + componentIDSections
 	}
 
+	if ns.HasPrefix(Slash + sectionToExtend) {
+		return Slash + sectionToExtend
+	}
+
 	return sectionToExtend
 }
 

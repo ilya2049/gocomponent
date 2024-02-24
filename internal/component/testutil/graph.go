@@ -1,6 +1,10 @@
 package testutil
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/ilya2049/gocomponent/internal/component"
+)
 
 func BuildGraphString(imports ...string) string {
 	sb := strings.Builder{}
@@ -10,4 +14,14 @@ func BuildGraphString(imports ...string) string {
 	}
 
 	return sb.String()
+}
+
+func GetComponentIDs(g *component.Graph) []string {
+	var componentIDs []string
+
+	for _, c := range g.Components() {
+		componentIDs = append(componentIDs, c.ID())
+	}
+
+	return componentIDs
 }
