@@ -6,6 +6,7 @@ import (
 	"github.com/ilya2049/gocomponent/internal/component"
 	"github.com/ilya2049/gocomponent/internal/component/testutil"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGraph_MakeUniqueComponentIDs(t *testing.T) {
@@ -235,7 +236,8 @@ func TestGraph_ExtendComponentIDs(t *testing.T) {
 			g.MakeUniqueComponentIDs()
 
 			// When
-			g.ExtendComponentIDs(tt.idRegexpPatternAndSections)
+			err := g.ExtendComponentIDs(tt.idRegexpPatternAndSections)
+			require.NoError(t, err)
 
 			// Then
 			componentIDs := testutil.GetComponentIDs(g)
@@ -243,4 +245,24 @@ func TestGraph_ExtendComponentIDs(t *testing.T) {
 			assert.ElementsMatch(t, tt.wantComponentIDs, componentIDs)
 		})
 	}
+}
+
+func TestGraph_ExtendComponentIDs_ErrorCase(t *testing.T) {
+	// Given
+	component1 := component.New(component.NewNamespace("/internal"))
+	component2 := component.New(component.NewNamespace("github.com/user/lib/v5"))
+
+	g := component.NewGraph(component.Imports{
+		component.NewImport(component1, component2),
+	})
+
+	g.MakeUniqueComponentIDs()
+
+	// When
+	err := g.ExtendComponentIDs(map[string]int{
+		"+": 1, // invalid regexp
+	})
+
+	// Then
+	assert.Error(t, err)
 }

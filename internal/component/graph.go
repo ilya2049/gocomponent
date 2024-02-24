@@ -63,13 +63,11 @@ func (g *Graph) MakeUniqueComponentIDs() {
 	}
 }
 
-func (g *Graph) ExtendComponentIDs(idRegexpPatternAndSections map[string]int) {
+func (g *Graph) ExtendComponentIDs(idRegexpPatternAndSections map[string]int) error {
 	for idRegexpPattern, sections := range idRegexpPatternAndSections {
 		r, err := regexp.Compile(idRegexpPattern)
 		if err != nil {
-			fmt.Printf("extend component ids: %s\n", err.Error())
-
-			continue
+			return fmt.Errorf("extend component ids: %w", err)
 		}
 
 		for _, component := range g.components {
@@ -80,6 +78,8 @@ func (g *Graph) ExtendComponentIDs(idRegexpPatternAndSections map[string]int) {
 			}
 		}
 	}
+
+	return nil
 }
 
 func (g *Graph) Colorize(namespaceColorMap map[Namespace]Color) {

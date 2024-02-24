@@ -68,7 +68,9 @@ func GenerateGraph() (*component.Graph, error) {
 	componentGraph.MakeUniqueComponentIDs()
 
 	if len(conf.ExtendComponentIDs) > 0 {
-		componentGraph.ExtendComponentIDs(conf.ExtendComponentIDs)
+		if err := componentGraph.ExtendComponentIDs(conf.ExtendComponentIDs); err != nil {
+			return nil, err
+		}
 	}
 
 	return componentGraph, nil
