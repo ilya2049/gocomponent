@@ -25,3 +25,7 @@ func GetComponentIDs(g *component.Graph) []string {
 
 	return componentIDs
 }
+
+func AreComponentsEqual(component1, component2 *component.Component) bool {
+	return component1.Namespace().String() == component2.Namespace().String()
+}

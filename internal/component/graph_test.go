@@ -523,3 +523,59 @@ func TestGraph_RemoveThirdPartyComponents(t *testing.T) {
 
 	assert.Equal(t, wantGraphString, g.String())
 }
+
+func TestGraph_ColorizeThirdParty(t *testing.T) {
+	// Given
+	pkg := component.New(component.NewNamespace("/pkg"))
+	thirdParty := component.New(component.NewNamespace("github.com/user/lib/v5"))
+
+	g := component.NewGraph(component.Imports{
+		component.NewImport(pkg, thirdParty),
+	})
+
+	redColor := component.NewColor("red")
+
+	// When
+	g.ColorizeThirdParty(redColor)
+
+	// Then
+	for _, aComponent := range g.Components() {
+		if aComponent.IsThirdParty() {
+			assert.Equal(t, redColor.String(), aComponent.Color().String())
+		}
+	}
+}
+
+func TestGraph_Colorize(t *testing.T) {
+	// Given
+	main := component.New(component.NewNamespace("/cmd/main"))
+	domainUser := component.New(component.NewNamespace("/domain/user"))
+	pkg := component.New(component.NewNamespace("/pkg"))
+	thirdParty := component.New(component.NewNamespace("github.com/user/lib/v5"))
+
+	g := component.NewGraph(component.Imports{
+		component.NewImport(main, domainUser),
+		component.NewImport(domainUser, pkg),
+		component.NewImport(pkg, thirdParty),
+	})
+
+	redColor := "red"
+	blueColor := "blue"
+
+	// When
+	g.Colorize(component.NewNamespaceColorMap(map[string]string{
+		"/cmd/main": redColor,
+		"lib/v5":    blueColor,
+	}))
+
+	// Then
+	for _, aComponent := range g.Components() {
+		if testutil.AreComponentsEqual(aComponent, main) {
+			assert.Equal(t, redColor, aComponent.Color().String())
+		}
+
+		if testutil.AreComponentsEqual(aComponent, thirdParty) {
+			assert.Equal(t, blueColor, aComponent.Color().String())
+		}
+	}
+}
