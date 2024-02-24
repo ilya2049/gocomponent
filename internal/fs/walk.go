@@ -105,13 +105,10 @@ func (w *Walk) parseImportsOfGoFile(
 	for _, fileImport := range file.Imports {
 		namespace := component.NewNamespace(fileImport.Path.Value[1 : len(fileImport.Path.Value)-1])
 
-		var isComponentInProject bool
-
 		moduleNameWithSectionSeparator := moduleName + component.Slash
 
 		if namespace.HasPrefix(moduleNameWithSectionSeparator) {
 			namespace = namespace.TrimPrefix(moduleName)
-			isComponentInProject = true
 		}
 
 		if namespace == currentNamespace {
@@ -119,9 +116,6 @@ func (w *Walk) parseImportsOfGoFile(
 		}
 
 		component := w.project.GetOrAddComponent(namespace)
-		if !isComponentInProject {
-			component.MarkAsThirdParty()
-		}
 
 		imports[namespace] = component
 	}

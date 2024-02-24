@@ -505,7 +505,6 @@ func TestGraph_RemoveThirdPartyComponents(t *testing.T) {
 	domainUser := component.New(component.NewNamespace("/domain/user"))
 	pkg := component.New(component.NewNamespace("/pkg"))
 	thirdParty := component.New(component.NewNamespace("github.com/user/lib/v5"))
-	thirdParty.MarkAsThirdParty()
 
 	g := component.NewGraph(component.Imports{
 		component.NewImport(main, domainUser),

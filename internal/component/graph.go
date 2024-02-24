@@ -96,7 +96,7 @@ func (g *Graph) Colorize(namespaceColorMap map[Namespace]Color) {
 
 func (g *Graph) ColorizeThirdParty(color Color) {
 	for _, component := range g.components {
-		if component.isThirdParty {
+		if component.IsThirdParty() {
 			component.Colorize(color)
 		}
 	}
@@ -106,7 +106,7 @@ func (g *Graph) RemoveThirdPartyComponents() *Graph {
 	newImports := make(Imports, 0)
 
 	for _, imp := range g.Imports() {
-		if !imp.to.isThirdParty {
+		if !imp.to.IsThirdParty() {
 			newImports = append(newImports, imp)
 		}
 	}

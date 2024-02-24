@@ -1,27 +1,23 @@
 package component
 
+import "strings"
+
 type Component struct {
-	namespace    Namespace
-	id           string
-	isThirdParty bool
-	color        Color
+	namespace Namespace
+	id        string
+	color     Color
 }
 
 func New(namespace Namespace) *Component {
 	return &Component{
-		namespace:    namespace,
-		id:           "",
-		isThirdParty: false,
-		color:        "",
+		namespace: namespace,
+		id:        "",
+		color:     "",
 	}
 }
 
-func (c *Component) MarkAsThirdParty() {
-	c.isThirdParty = true
-}
-
 func (c *Component) IsThirdParty() bool {
-	return c.isThirdParty
+	return !strings.HasPrefix(c.namespace.String(), Slash)
 }
 
 func (c *Component) ExtendID() {
