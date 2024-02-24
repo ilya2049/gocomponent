@@ -266,3 +266,261 @@ func TestGraph_ExtendComponentIDs_ErrorCase(t *testing.T) {
 	// Then
 	assert.Error(t, err)
 }
+
+func TestGraph_ExcludeChildComponents(t *testing.T) {
+	tests := []struct {
+		name                string
+		newGraph            func() *component.Graph
+		componentsToExclude component.Namespaces
+		wantGraphString     string
+	}{
+		{
+			name: "Exclude a root-based child component",
+			newGraph: func() *component.Graph {
+				main := component.New(component.NewNamespace("/cmd/main"))
+				domainUser := component.New(component.NewNamespace("/domain/user"))
+				pkg := component.New(component.NewNamespace("/pkg"))
+
+				return component.NewGraph(component.Imports{
+					component.NewImport(main, domainUser),
+					component.NewImport(domainUser, pkg),
+				})
+			},
+			componentsToExclude: component.NewNamespaces([]string{
+				"/domain/user",
+			}),
+			wantGraphString: testutil.BuildGraphString(
+				"/domain/user -> /pkg",
+			),
+		},
+		{
+			name: "Exclude a section-marker child component",
+			newGraph: func() *component.Graph {
+				main := component.New(component.NewNamespace("/cmd/main"))
+				domainUser := component.New(component.NewNamespace("/domain/user"))
+				pkg := component.New(component.NewNamespace("/pkg"))
+
+				return component.NewGraph(component.Imports{
+					component.NewImport(main, domainUser),
+					component.NewImport(domainUser, pkg),
+				})
+			},
+			componentsToExclude: component.NewNamespaces([]string{
+				"user",
+			}),
+			wantGraphString: testutil.BuildGraphString(
+				"/domain/user -> /pkg",
+			),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := tt.newGraph()
+
+			g = g.ExcludeChildComponents(tt.componentsToExclude)
+
+			assert.Equal(t, tt.wantGraphString, g.String())
+		})
+	}
+}
+
+func TestGraph_ExcludeParentComponents(t *testing.T) {
+	tests := []struct {
+		name                string
+		newGraph            func() *component.Graph
+		componentsToExclude component.Namespaces
+		wantGraphString     string
+	}{
+		{
+			name: "Exclude a root-based parent component",
+			newGraph: func() *component.Graph {
+				main := component.New(component.NewNamespace("/cmd/main"))
+				domainUser := component.New(component.NewNamespace("/domain/user"))
+				pkg := component.New(component.NewNamespace("/pkg"))
+
+				return component.NewGraph(component.Imports{
+					component.NewImport(main, domainUser),
+					component.NewImport(domainUser, pkg),
+				})
+			},
+			componentsToExclude: component.NewNamespaces([]string{
+				"/domain/user",
+			}),
+			wantGraphString: testutil.BuildGraphString(
+				"/cmd/main -> /domain/user",
+			),
+		},
+		{
+			name: "Exclude a section-marker parent component",
+			newGraph: func() *component.Graph {
+				main := component.New(component.NewNamespace("/cmd/main"))
+				domainUser := component.New(component.NewNamespace("/domain/user"))
+				pkg := component.New(component.NewNamespace("/pkg"))
+
+				return component.NewGraph(component.Imports{
+					component.NewImport(main, domainUser),
+					component.NewImport(domainUser, pkg),
+				})
+			},
+			componentsToExclude: component.NewNamespaces([]string{
+				"user",
+			}),
+			wantGraphString: testutil.BuildGraphString(
+				"/cmd/main -> /domain/user",
+			),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := tt.newGraph()
+
+			g = g.ExcludeParentComponents(tt.componentsToExclude)
+
+			assert.Equal(t, tt.wantGraphString, g.String())
+		})
+	}
+}
+
+func TestGraph_IncludeChildComponents(t *testing.T) {
+	tests := []struct {
+		name                string
+		newGraph            func() *component.Graph
+		componentsToInclude component.Namespaces
+		wantGraphString     string
+	}{
+		{
+			name: "Include a root-based child component",
+			newGraph: func() *component.Graph {
+				main := component.New(component.NewNamespace("/cmd/main"))
+				domainUser := component.New(component.NewNamespace("/domain/user"))
+				pkg := component.New(component.NewNamespace("/pkg"))
+
+				return component.NewGraph(component.Imports{
+					component.NewImport(main, domainUser),
+					component.NewImport(domainUser, pkg),
+				})
+			},
+			componentsToInclude: component.NewNamespaces([]string{
+				"/domain/user",
+			}),
+			wantGraphString: testutil.BuildGraphString(
+				"/cmd/main -> /domain/user",
+			),
+		},
+		{
+			name: "Include a section-marker child component",
+			newGraph: func() *component.Graph {
+				main := component.New(component.NewNamespace("/cmd/main"))
+				domainUser := component.New(component.NewNamespace("/domain/user"))
+				pkg := component.New(component.NewNamespace("/pkg"))
+
+				return component.NewGraph(component.Imports{
+					component.NewImport(main, domainUser),
+					component.NewImport(domainUser, pkg),
+				})
+			},
+			componentsToInclude: component.NewNamespaces([]string{
+				"user",
+			}),
+			wantGraphString: testutil.BuildGraphString(
+				"/cmd/main -> /domain/user",
+			),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := tt.newGraph()
+
+			g = g.IncludeChildComponents(tt.componentsToInclude)
+
+			assert.Equal(t, tt.wantGraphString, g.String())
+		})
+	}
+}
+
+func TestGraph_IncludeParentComponents(t *testing.T) {
+	tests := []struct {
+		name                string
+		newGraph            func() *component.Graph
+		componentsToInclude component.Namespaces
+		wantGraphString     string
+	}{
+		{
+			name: "Include a root-based child component",
+			newGraph: func() *component.Graph {
+				main := component.New(component.NewNamespace("/cmd/main"))
+				domainUser := component.New(component.NewNamespace("/domain/user"))
+				pkg := component.New(component.NewNamespace("/pkg"))
+
+				return component.NewGraph(component.Imports{
+					component.NewImport(main, domainUser),
+					component.NewImport(domainUser, pkg),
+				})
+			},
+			componentsToInclude: component.NewNamespaces([]string{
+				"/domain/user",
+			}),
+			wantGraphString: testutil.BuildGraphString(
+				"/domain/user -> /pkg",
+			),
+		},
+		{
+			name: "Include a section-marker child component",
+			newGraph: func() *component.Graph {
+				main := component.New(component.NewNamespace("/cmd/main"))
+				domainUser := component.New(component.NewNamespace("/domain/user"))
+				pkg := component.New(component.NewNamespace("/pkg"))
+
+				return component.NewGraph(component.Imports{
+					component.NewImport(main, domainUser),
+					component.NewImport(domainUser, pkg),
+				})
+			},
+			componentsToInclude: component.NewNamespaces([]string{
+				"user",
+			}),
+			wantGraphString: testutil.BuildGraphString(
+				"/domain/user -> /pkg",
+			),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := tt.newGraph()
+
+			g = g.IncludeParentComponents(tt.componentsToInclude)
+
+			assert.Equal(t, tt.wantGraphString, g.String())
+		})
+	}
+}
+
+func TestGraph_RemoveThirdPartyComponents(t *testing.T) {
+	// Given
+	main := component.New(component.NewNamespace("/cmd/main"))
+	domainUser := component.New(component.NewNamespace("/domain/user"))
+	pkg := component.New(component.NewNamespace("/pkg"))
+	thirdParty := component.New(component.NewNamespace("github.com/user/lib/v5"))
+	thirdParty.MarkAsThirdParty()
+
+	g := component.NewGraph(component.Imports{
+		component.NewImport(main, domainUser),
+		component.NewImport(domainUser, pkg),
+		component.NewImport(pkg, thirdParty),
+	})
+
+	// When
+	g = g.RemoveThirdPartyComponents()
+
+	// Then
+	wantGraphString := testutil.BuildGraphString(
+		"/cmd/main -> /domain/user",
+		"/domain/user -> /pkg",
+	)
+
+	assert.Equal(t, wantGraphString, g.String())
+}
