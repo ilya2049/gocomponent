@@ -5,11 +5,6 @@ import (
 	"os"
 
 	"github.com/ilya2049/gocomponent/internal/cliapp"
-	"github.com/ilya2049/gocomponent/internal/component"
-	"github.com/ilya2049/gocomponent/internal/config"
-	"github.com/ilya2049/gocomponent/internal/dot"
-	"github.com/ilya2049/gocomponent/internal/fs"
-	"github.com/ilya2049/gocomponent/internal/project"
 
 	"github.com/urfave/cli/v2"
 )
@@ -61,49 +56,10 @@ func runHTTPServer(cCtx *cli.Context) error {
 	return server.ListenAndServe()
 }
 
-func printDotGraph(cCtx *cli.Context) error {
-	conf, err := config.Read()
-	if err != nil {
-		return err
-	}
-
-	prj := project.New()
-
-	fsWalker := fs.NewWalk(conf.ProjectDirectory, prj)
-
-	componentGraph, err := component.GenerateGraph(conf.ToComponentGraphConfig(), fsWalker)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(dot.Export(componentGraph))
-
-	return nil
+func printDotGraph(*cli.Context) error {
+	return cliapp.PrintDotGraph()
 }
 
-func printNamespaces(cCtx *cli.Context) error {
-	conf, err := config.Read()
-	if err != nil {
-		return err
-	}
-
-	prj := project.New()
-
-	fsWalker := fs.NewWalk(conf.ProjectDirectory, prj)
-
-	componentGraph, err := component.GenerateGraph(conf.ToComponentGraphConfig(), fsWalker)
-	if err != nil {
-		return err
-	}
-
-	for _, component := range componentGraph.Components() {
-		var thirdParty string
-		if component.IsThirdParty() {
-			thirdParty = "*"
-		}
-
-		fmt.Println(component.Namespace(), "["+thirdParty+component.ID()+"]")
-	}
-
-	return nil
+func printNamespaces(*cli.Context) error {
+	return cliapp.PrintNamespaces()
 }
