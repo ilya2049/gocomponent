@@ -6,13 +6,15 @@ import (
 	"github.com/ilya2049/gocomponent/internal/domain/component"
 )
 
-type readComponentGraphFunc func() (*component.GraphConfig, *component.Graph, error)
+type componentGraphReader interface {
+	ReadComponentGraph() (*component.GraphConfig, *component.Graph, error)
+}
 
 const defaultHTTPServerPort = "8080"
 
 func NewHTTPServer(
 	port string,
-	readComponentGraph readComponentGraphFunc,
+	componentGraphReader componentGraphReader,
 	dotSVGExporter dotSVGExporter,
 ) *http.Server {
 	if port == "" {
@@ -25,7 +27,7 @@ func NewHTTPServer(
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/", handleHTTPRequest(readComponentGraph, dotSVGExporter))
+	mux.HandleFunc("/", handleHTTPRequest(componentGraphReader, dotSVGExporter))
 
 	server.Handler = mux
 
@@ -33,11 +35,11 @@ func NewHTTPServer(
 }
 
 func handleHTTPRequest(
-	readComponentGraph readComponentGraphFunc,
+	componentGraphReader componentGraphReader,
 	dotSVGExporter dotSVGExporter,
 ) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, _ *http.Request) {
-		conf, initialComponentGraph, err := readComponentGraph()
+		conf, initialComponentGraph, err := componentGraphReader.ReadComponentGraph()
 		if err != nil {
 			w.Write([]byte(err.Error()))
 

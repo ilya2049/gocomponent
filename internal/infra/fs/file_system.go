@@ -12,7 +12,10 @@ import (
 	"github.com/ilya2049/gocomponent/internal/infra/config"
 )
 
-func ReadComponentGraph() (*component.GraphConfig, *component.Graph, error) {
+type ComponentGraphReader struct {
+}
+
+func (r *ComponentGraphReader) ReadComponentGraph() (*component.GraphConfig, *component.Graph, error) {
 	conf, err := config.Read()
 	if err != nil {
 		return nil, nil, err

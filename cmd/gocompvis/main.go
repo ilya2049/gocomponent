@@ -51,7 +51,7 @@ func newApp() *cli.App {
 func runHTTPServer(cCtx *cli.Context) error {
 	serverPort := cCtx.String("port")
 
-	server := cliapp.NewHTTPServer(serverPort, fs.ReadComponentGraph, &dot.Exporter{})
+	server := cliapp.NewHTTPServer(serverPort, &fs.ComponentGraphReader{}, &dot.Exporter{})
 
 	fmt.Println("Server started at " + server.Addr)
 
@@ -59,7 +59,9 @@ func runHTTPServer(cCtx *cli.Context) error {
 }
 
 func printDotGraph(*cli.Context) error {
-	conf, initialComponentGraph, err := fs.ReadComponentGraph()
+	componentGraphReader := &fs.ComponentGraphReader{}
+
+	conf, initialComponentGraph, err := componentGraphReader.ReadComponentGraph()
 	if err != nil {
 		return err
 	}
@@ -68,7 +70,9 @@ func printDotGraph(*cli.Context) error {
 }
 
 func printNamespaces(*cli.Context) error {
-	conf, initialComponentGraph, err := fs.ReadComponentGraph()
+	componentGraphReader := &fs.ComponentGraphReader{}
+
+	conf, initialComponentGraph, err := componentGraphReader.ReadComponentGraph()
 	if err != nil {
 		return err
 	}
