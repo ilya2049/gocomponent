@@ -1,27 +1,27 @@
-package project
+package fs
 
 import "github.com/ilya2049/gocomponent/internal/component"
 
-type Package struct {
+type projectPackage struct {
 	*component.Component
 
 	imports map[component.Namespace]*component.Component
 }
 
-func NewPackage(c *component.Component, imports map[component.Namespace]*component.Component) *Package {
-	return &Package{
+func newProjectPackage(c *component.Component, imports map[component.Namespace]*component.Component) *projectPackage {
+	return &projectPackage{
 		Component: c,
 		imports:   imports,
 	}
 }
 
-func (p *Package) Join(anotherPackage *Package) {
+func (p *projectPackage) join(anotherPackage *projectPackage) {
 	for namespace, component := range anotherPackage.imports {
 		p.imports[namespace] = component
 	}
 }
 
-func (p *Package) Imports() []*component.Component {
+func (p *projectPackage) getImports() []*component.Component {
 	var components []*component.Component
 
 	for _, component := range p.imports {

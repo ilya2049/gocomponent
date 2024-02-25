@@ -9,12 +9,11 @@ import (
 	"strings"
 
 	"github.com/ilya2049/gocomponent/internal/component"
-	"github.com/ilya2049/gocomponent/internal/project"
 )
 
 type Walk struct {
 	projectDir string
-	project    *project.Project
+	project    *project
 }
 
 func NewWalk(projectDir string) *Walk {
@@ -24,7 +23,7 @@ func NewWalk(projectDir string) *Walk {
 
 	return &Walk{
 		projectDir: projectDir,
-		project:    project.New(),
+		project:    newProject(),
 	}
 }
 
@@ -54,14 +53,14 @@ func (w *Walk) ReadComponentGraph() (*component.Graph, error) {
 			namespace = component.Slash + namespace.TrimPrefix(w.projectDir)
 		}
 
-		aComponent := w.project.GetOrAddComponent(namespace)
+		aComponent := w.project.getOrAddComponent(namespace)
 
 		packageImports, err := w.parseImportsOfGoFile(namespace, moduleName, path)
 		if err != nil {
 			return err
 		}
 
-		aPackage := project.NewPackage(aComponent, packageImports)
+		aPackage := newProjectPackage(aComponent, packageImports)
 
 		w.addPackageInProject(namespace, aPackage)
 
@@ -72,22 +71,22 @@ func (w *Walk) ReadComponentGraph() (*component.Graph, error) {
 		return nil, err
 	}
 
-	return w.project.CreateComponentGraph(), nil
+	return w.project.createComponentGraph(), nil
 }
 
 func (w *Walk) isRootNamespace(namespace component.Namespace) bool {
 	return namespace+component.Slash == component.Namespace(w.projectDir)
 }
 
-func (w *Walk) addPackageInProject(namespace component.Namespace, newPackage *project.Package) {
-	existingPackage, ok := w.project.FindPackage(namespace)
+func (w *Walk) addPackageInProject(namespace component.Namespace, newPackage *projectPackage) {
+	existingPackage, ok := w.project.findPackage(namespace)
 	if ok {
-		existingPackage.Join(newPackage)
+		existingPackage.join(newPackage)
 
 		return
 	}
 
-	w.project.AddPackage(namespace, newPackage)
+	w.project.addPackage(namespace, newPackage)
 }
 
 func (w *Walk) parseImportsOfGoFile(
@@ -115,7 +114,7 @@ func (w *Walk) parseImportsOfGoFile(
 			continue
 		}
 
-		component := w.project.GetOrAddComponent(namespace)
+		component := w.project.getOrAddComponent(namespace)
 
 		imports[namespace] = component
 	}
