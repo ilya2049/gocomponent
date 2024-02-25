@@ -4,27 +4,10 @@ import (
 	"fmt"
 
 	"github.com/ilya2049/gocomponent/internal/component"
-	"github.com/ilya2049/gocomponent/internal/config"
-	"github.com/ilya2049/gocomponent/internal/fs"
-	"github.com/ilya2049/gocomponent/internal/project"
 )
 
-func PrintNamespaces() error {
-	conf, err := config.Read()
-	if err != nil {
-		return err
-	}
-
-	prj := project.New()
-
-	fsWalker := fs.NewWalk(conf.ProjectDirectory, prj)
-
-	initialComponentGraph, err := fsWalker.CreateComponentGraph()
-	if err != nil {
-		return err
-	}
-
-	componentGraph, err := component.ApplyGraphConfig(conf.ToComponentGraphConfig(), initialComponentGraph)
+func PrintNamespaces(conf *component.GraphConfig, initialComponentGraph *component.Graph) error {
+	componentGraph, err := component.ApplyGraphConfig(conf, initialComponentGraph)
 	if err != nil {
 		return err
 	}

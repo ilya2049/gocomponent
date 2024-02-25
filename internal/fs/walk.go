@@ -17,18 +17,18 @@ type Walk struct {
 	project    *project.Project
 }
 
-func NewWalk(projectDir string, prj *project.Project) *Walk {
+func NewWalk(projectDir string) *Walk {
 	if !strings.HasSuffix(projectDir, component.Slash) {
 		projectDir += component.Slash
 	}
 
 	return &Walk{
 		projectDir: projectDir,
-		project:    prj,
+		project:    project.New(),
 	}
 }
 
-func (w *Walk) CreateComponentGraph() (*component.Graph, error) {
+func (w *Walk) ReadComponentGraph() (*component.Graph, error) {
 	moduleName, err := readModuleName(w.projectDir)
 	if err != nil {
 		return nil, err

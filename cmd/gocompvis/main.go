@@ -5,6 +5,9 @@ import (
 	"os"
 
 	"github.com/ilya2049/gocomponent/internal/cliapp"
+	"github.com/ilya2049/gocomponent/internal/component"
+	"github.com/ilya2049/gocomponent/internal/config"
+	"github.com/ilya2049/gocomponent/internal/fs"
 
 	"github.com/urfave/cli/v2"
 )
@@ -49,7 +52,7 @@ func newApp() *cli.App {
 func runHTTPServer(cCtx *cli.Context) error {
 	serverPort := cCtx.String("port")
 
-	server := cliapp.NewHTTPServer(serverPort)
+	server := cliapp.NewHTTPServer(serverPort, readComponentGraph)
 
 	fmt.Println("Server started at " + server.Addr)
 
@@ -57,9 +60,35 @@ func runHTTPServer(cCtx *cli.Context) error {
 }
 
 func printDotGraph(*cli.Context) error {
-	return cliapp.PrintDotGraph()
+	conf, initialComponentGraph, err := readComponentGraph()
+	if err != nil {
+		return err
+	}
+
+	return cliapp.PrintDotGraph(conf, initialComponentGraph)
 }
 
 func printNamespaces(*cli.Context) error {
-	return cliapp.PrintNamespaces()
+	conf, initialComponentGraph, err := readComponentGraph()
+	if err != nil {
+		return err
+	}
+
+	return cliapp.PrintNamespaces(conf, initialComponentGraph)
+}
+
+func readComponentGraph() (*component.GraphConfig, *component.Graph, error) {
+	conf, err := config.Read()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	fsWalker := fs.NewWalk(conf.ProjectDirectory)
+
+	initialComponentGraph, err := fsWalker.ReadComponentGraph()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return conf.ToComponentGraphConfig(), initialComponentGraph, nil
 }
