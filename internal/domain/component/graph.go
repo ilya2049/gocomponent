@@ -296,8 +296,14 @@ func (g *Graph) createCustomComponent(namespace Namespace) *Graph {
 func (g *Graph) String() string {
 	sb := strings.Builder{}
 
-	for _, imp := range g.Imports() {
-		sb.WriteString(imp.From().Namespace().String() + " -> " + imp.To().Namespace().String() + "\n")
+	graphImports := g.Imports()
+
+	for i, imp := range graphImports {
+		sb.WriteString(imp.From().Namespace().String() + " -> " + imp.To().Namespace().String())
+
+		if i < len(graphImports)-1 {
+			sb.WriteRune('\n')
+		}
 	}
 
 	return sb.String()

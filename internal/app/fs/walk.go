@@ -45,7 +45,7 @@ func (w *Walk) ReadComponentGraph() (*component.Graph, error) {
 		return nil, err
 	}
 
-	err = w.filePathWalker.Walk(w.projectDir, func(path string, info os.FileInfo, err error) error {
+	err = w.filePathWalker.Walk(w.projectDir, func(path string, _ os.FileInfo, err error) error {
 		if err != nil {
 			return fmt.Errorf("walk err: %w", err)
 		}
@@ -64,9 +64,9 @@ func (w *Walk) ReadComponentGraph() (*component.Graph, error) {
 		}
 
 		if w.isRootNamespace(namespace) {
-			namespace = component.NewNamespace(component.Slash)
+			namespace = w.createRootNamespace()
 		} else {
-			namespace = component.Slash + namespace.TrimPrefix(w.projectDir)
+			namespace = w.createRootBasedNamespace(namespace)
 		}
 
 		aComponent := w.project.getOrAddComponent(namespace)
@@ -92,6 +92,14 @@ func (w *Walk) ReadComponentGraph() (*component.Graph, error) {
 
 func (w *Walk) isRootNamespace(namespace component.Namespace) bool {
 	return namespace+component.Slash == component.Namespace(w.projectDir)
+}
+
+func (*Walk) createRootNamespace() component.Namespace {
+	return component.NewNamespace(component.Slash)
+}
+
+func (w *Walk) createRootBasedNamespace(namespace component.Namespace) component.Namespace {
+	return component.Slash + namespace.TrimPrefix(w.projectDir)
 }
 
 func (w *Walk) addPackageInProject(namespace component.Namespace, newPackage *projectPackage) {
@@ -143,14 +151,14 @@ var ErrFirstLineOfGoModShouldIncludeExactlyTwoPArts = errors.New(
 )
 
 func (w *Walk) readModuleName(projectDir string) (string, error) {
-	goModFileContents, err := w.fileReader.ReadFile(projectDir + "go.mod")
+	goModFileBytes, err := w.fileReader.ReadFile(projectDir + "go.mod")
 	if err != nil {
 		return "", fmt.Errorf("read go.mod: %w", err)
 	}
 
 	var firstLineOfGoModFile = []byte{}
 
-	for _, b := range goModFileContents {
+	for _, b := range goModFileBytes {
 		if b == '\n' {
 			break
 		} else {

@@ -1,20 +1,8 @@
 package component_test
 
 import (
-	"strings"
-
 	"github.com/ilya2049/gocomponent/internal/domain/component"
 )
-
-func buildGraphString(imports ...string) string {
-	sb := strings.Builder{}
-
-	for _, imp := range imports {
-		sb.WriteString(imp + "\n")
-	}
-
-	return sb.String()
-}
 
 func getComponentIDs(g *component.Graph) []string {
 	var componentIDs []string

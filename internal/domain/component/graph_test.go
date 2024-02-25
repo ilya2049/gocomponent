@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/ilya2049/gocomponent/internal/domain/component"
+	"github.com/ilya2049/gocomponent/internal/pkg/sbuilder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -57,7 +58,7 @@ func TestApplyGraphConfig(t *testing.T) {
 	require.NoError(t, err)
 
 	// Then
-	wantGeneratedComponentGraphString := buildGraphString(
+	wantGeneratedComponentGraphString := sbuilder.BuildMultilineString(
 		"/internal/app/product -> /internal/domain/product",
 		"/internal/domain/product -> /internal/pkg",
 		"/internal/pkg -> net/http",
@@ -151,7 +152,7 @@ func TestGraph_CreateCustomComponents(t *testing.T) {
 				})
 			},
 			customComponents: []string{"user"},
-			wantGraphString: buildGraphString(
+			wantGraphString: sbuilder.BuildMultilineString(
 				"user -> /pkg",
 				"/cmd/main -> user",
 			),
@@ -173,7 +174,7 @@ func TestGraph_CreateCustomComponents(t *testing.T) {
 				})
 			},
 			customComponents: []string{"/postgresql"},
-			wantGraphString: buildGraphString(
+			wantGraphString: sbuilder.BuildMultilineString(
 				"/postgresql -> /pkg",
 				"/cmd/main -> /postgresql",
 			),
@@ -191,7 +192,7 @@ func TestGraph_CreateCustomComponents(t *testing.T) {
 				})
 			},
 			customComponents: []string{"/mongodb"},
-			wantGraphString: buildGraphString(
+			wantGraphString: sbuilder.BuildMultilineString(
 				"/cmd/main -> /postgresql/user",
 				"/postgresql/user -> /pkg",
 			),
@@ -233,7 +234,7 @@ func TestGraph_String(t *testing.T) {
 					component.NewImport(domainUser, pkg),
 				})
 			},
-			wantGraphString: buildGraphString(
+			wantGraphString: sbuilder.BuildMultilineString(
 				"/cmd/main -> /postgresql/user",
 				"/cmd/main -> /domain/user",
 				"/postgresql/user -> /domain/user",
@@ -347,7 +348,7 @@ func TestGraph_ExcludeChildComponents(t *testing.T) {
 			componentsToExclude: component.NewNamespaces([]string{
 				"/domain/user",
 			}),
-			wantGraphString: buildGraphString(
+			wantGraphString: sbuilder.BuildMultilineString(
 				"/domain/user -> /pkg",
 			),
 		},
@@ -366,7 +367,7 @@ func TestGraph_ExcludeChildComponents(t *testing.T) {
 			componentsToExclude: component.NewNamespaces([]string{
 				"user",
 			}),
-			wantGraphString: buildGraphString(
+			wantGraphString: sbuilder.BuildMultilineString(
 				"/domain/user -> /pkg",
 			),
 		},
@@ -405,7 +406,7 @@ func TestGraph_ExcludeParentComponents(t *testing.T) {
 			componentsToExclude: component.NewNamespaces([]string{
 				"/domain/user",
 			}),
-			wantGraphString: buildGraphString(
+			wantGraphString: sbuilder.BuildMultilineString(
 				"/cmd/main -> /domain/user",
 			),
 		},
@@ -424,7 +425,7 @@ func TestGraph_ExcludeParentComponents(t *testing.T) {
 			componentsToExclude: component.NewNamespaces([]string{
 				"user",
 			}),
-			wantGraphString: buildGraphString(
+			wantGraphString: sbuilder.BuildMultilineString(
 				"/cmd/main -> /domain/user",
 			),
 		},
@@ -463,7 +464,7 @@ func TestGraph_IncludeChildComponents(t *testing.T) {
 			componentsToInclude: component.NewNamespaces([]string{
 				"/domain/user",
 			}),
-			wantGraphString: buildGraphString(
+			wantGraphString: sbuilder.BuildMultilineString(
 				"/cmd/main -> /domain/user",
 			),
 		},
@@ -482,7 +483,7 @@ func TestGraph_IncludeChildComponents(t *testing.T) {
 			componentsToInclude: component.NewNamespaces([]string{
 				"user",
 			}),
-			wantGraphString: buildGraphString(
+			wantGraphString: sbuilder.BuildMultilineString(
 				"/cmd/main -> /domain/user",
 			),
 		},
@@ -521,7 +522,7 @@ func TestGraph_IncludeParentComponents(t *testing.T) {
 			componentsToInclude: component.NewNamespaces([]string{
 				"/domain/user",
 			}),
-			wantGraphString: buildGraphString(
+			wantGraphString: sbuilder.BuildMultilineString(
 				"/domain/user -> /pkg",
 			),
 		},
@@ -540,7 +541,7 @@ func TestGraph_IncludeParentComponents(t *testing.T) {
 			componentsToInclude: component.NewNamespaces([]string{
 				"user",
 			}),
-			wantGraphString: buildGraphString(
+			wantGraphString: sbuilder.BuildMultilineString(
 				"/domain/user -> /pkg",
 			),
 		},
@@ -574,7 +575,7 @@ func TestGraph_RemoveThirdPartyComponents(t *testing.T) {
 	g = g.RemoveThirdPartyComponents()
 
 	// Then
-	wantGraphString := buildGraphString(
+	wantGraphString := sbuilder.BuildMultilineString(
 		"/cmd/main -> /domain/user",
 		"/domain/user -> /pkg",
 	)
