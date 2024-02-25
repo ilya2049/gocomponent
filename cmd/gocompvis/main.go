@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"os"
 	"path/filepath"
 
@@ -84,7 +87,7 @@ func readComponentGraph() (*component.GraphConfig, *component.Graph, error) {
 		return nil, nil, err
 	}
 
-	fsWalker := fs.NewWalk(conf.ProjectDirectory, &fileReader{}, &filePathWalker{})
+	fsWalker := fs.NewWalk(conf.ProjectDirectory, &fileReader{}, &filePathWalker{}, &astFileParser{})
 
 	initialComponentGraph, err := fsWalker.ReadComponentGraph()
 	if err != nil {
@@ -106,4 +109,11 @@ type filePathWalker struct {
 
 func (w *filePathWalker) Walk(root string, fn filepath.WalkFunc) error {
 	return filepath.Walk(root, fn)
+}
+
+type astFileParser struct {
+}
+
+func (p *astFileParser) ParseFile(fset *token.FileSet, filename string, src any, mode parser.Mode) (f *ast.File, err error) {
+	return parser.ParseFile(fset, filename, src, mode)
 }

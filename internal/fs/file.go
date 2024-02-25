@@ -1,6 +1,9 @@
 package fs
 
 import (
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"path/filepath"
 	"regexp"
 
@@ -18,6 +21,10 @@ type fileReader interface {
 
 type filePathWalker interface {
 	Walk(root string, fn filepath.WalkFunc) error
+}
+
+type astFileParser interface {
+	ParseFile(fset *token.FileSet, filename string, src any, mode parser.Mode) (f *ast.File, err error)
 }
 
 func findNamespaceInPath(path string) (component.Namespace, bool) {

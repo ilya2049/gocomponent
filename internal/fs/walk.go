@@ -14,6 +14,7 @@ import (
 type Walk struct {
 	fileReader     fileReader
 	filePathWalker filePathWalker
+	astFileParser  astFileParser
 	projectDir     string
 	project        *project
 }
@@ -22,6 +23,7 @@ func NewWalk(
 	projectDir string,
 	fileReader fileReader,
 	filePathWalker filePathWalker,
+	astFileParser astFileParser,
 ) *Walk {
 	if !strings.HasSuffix(projectDir, component.Slash) {
 		projectDir += component.Slash
@@ -32,6 +34,7 @@ func NewWalk(
 		project:        newProject(),
 		fileReader:     fileReader,
 		filePathWalker: filePathWalker,
+		astFileParser:  astFileParser,
 	}
 }
 
@@ -102,7 +105,7 @@ func (w *Walk) parseImportsOfGoFile(
 	moduleName string,
 	goFileName string,
 ) (map[component.Namespace]*component.Component, error) {
-	file, err := parser.ParseFile(token.NewFileSet(), goFileName, nil, parser.Mode(0))
+	file, err := w.astFileParser.ParseFile(token.NewFileSet(), goFileName, nil, parser.Mode(0))
 	if err != nil {
 		return nil, fmt.Errorf("parse file: %w", err)
 	}
