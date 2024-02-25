@@ -120,7 +120,7 @@ func (w *Walk) parseImportsOfGoFile(
 ) (map[component.Namespace]*component.Component, error) {
 	file, err := w.astFileParser.ParseFile(token.NewFileSet(), goFileName, nil, parser.Mode(0))
 	if err != nil {
-		return nil, fmt.Errorf("parse file: %w", err)
+		return nil, fmt.Errorf("parse a .go file: %w", err)
 	}
 
 	imports := make(map[component.Namespace]*component.Component)
@@ -128,9 +128,9 @@ func (w *Walk) parseImportsOfGoFile(
 	for _, fileImport := range file.Imports {
 		namespace := component.NewNamespace(fileImport.Path.Value[1 : len(fileImport.Path.Value)-1])
 
-		moduleNameWithSectionSeparator := moduleName + component.Slash
+		moduleNameWithSlash := moduleName + component.Slash
 
-		if namespace.HasPrefix(moduleNameWithSectionSeparator) {
+		if namespace.HasPrefix(moduleNameWithSlash) {
 			namespace = namespace.TrimPrefix(moduleName)
 		}
 
