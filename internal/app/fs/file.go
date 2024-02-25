@@ -15,10 +15,6 @@ var (
 	goFileRegexp    = regexp.MustCompile(`^.*\.go$`)
 )
 
-type fileReader interface {
-	ReadFile(name string) ([]byte, error)
-}
-
 type filePathWalker interface {
 	Walk(root string, fn filepath.WalkFunc) error
 }

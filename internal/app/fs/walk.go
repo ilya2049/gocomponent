@@ -9,10 +9,11 @@ import (
 	"strings"
 
 	"github.com/ilya2049/gocomponent/internal/domain/component"
+	"github.com/ilya2049/gocomponent/internal/pkg/fs"
 )
 
 type Walk struct {
-	fileReader     fileReader
+	fileReader     fs.FileReader
 	filePathWalker filePathWalker
 	astFileParser  astFileParser
 	projectDir     string
@@ -21,7 +22,7 @@ type Walk struct {
 
 func NewWalk(
 	projectDir string,
-	fileReader fileReader,
+	fileReader fs.FileReader,
 	filePathWalker filePathWalker,
 	astFileParser astFileParser,
 ) *Walk {

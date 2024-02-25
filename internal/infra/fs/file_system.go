@@ -16,7 +16,9 @@ type ComponentGraphReader struct {
 }
 
 func (r *ComponentGraphReader) ReadComponentGraph() (*component.Graph, error) {
-	conf, err := config.Read()
+	configReader := config.NewReader(&fileReader{})
+
+	conf, err := configReader.ReadConfig()
 	if err != nil {
 		return nil, err
 	}

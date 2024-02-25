@@ -2,10 +2,10 @@ package config
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/BurntSushi/toml"
 	"github.com/ilya2049/gocomponent/internal/domain/component"
+	"github.com/ilya2049/gocomponent/internal/pkg/fs"
 )
 
 type Config struct {
@@ -35,8 +35,18 @@ func (conf *Config) ToComponentGraphConfig() *component.GraphConfig {
 	}
 }
 
-func Read() (*Config, error) {
-	configContents, err := os.ReadFile("config.toml")
+type Reader struct {
+	fileReader fs.FileReader
+}
+
+func NewReader(fileReader fs.FileReader) *Reader {
+	return &Reader{
+		fileReader: fileReader,
+	}
+}
+
+func (r *Reader) ReadConfig() (*Config, error) {
+	configContents, err := r.fileReader.ReadFile("config.toml")
 	if err != nil {
 		return nil, fmt.Errorf("read config: %w", err)
 	}
