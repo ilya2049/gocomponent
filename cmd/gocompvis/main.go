@@ -79,5 +79,7 @@ func printNamespaces(*cli.Context) error {
 		return err
 	}
 
-	return cliapp.PrintNamespaces(conf, initialComponentGraph)
+	printer := cliapp.NewNamespacePrinter(os.Stdout)
+
+	return printer.PrintNamespaces(conf, initialComponentGraph)
 }
