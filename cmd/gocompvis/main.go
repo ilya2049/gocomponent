@@ -66,7 +66,9 @@ func printDotGraph(*cli.Context) error {
 		return err
 	}
 
-	return cliapp.PrintDotGraph(conf, initialComponentGraph, &dot.Exporter{})
+	printer := cliapp.NewDotGraphPrinter(&dot.Exporter{}, os.Stdout)
+
+	return printer.PrintDotGraph(conf, initialComponentGraph)
 }
 
 func printNamespaces(*cli.Context) error {

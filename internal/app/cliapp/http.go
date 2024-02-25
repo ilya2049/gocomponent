@@ -27,39 +27,51 @@ func NewHTTPServer(
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/", handleHTTPRequest(componentGraphReader, dotSVGExporter))
+	handler := newHTTPRequestHandler(componentGraphReader, dotSVGExporter)
+
+	mux.HandleFunc("/", handler.handle)
 
 	server.Handler = mux
 
 	return &server
 }
 
-func handleHTTPRequest(
+type httpRequestHandler struct {
+	componentGraphReader componentGraphReader
+	dotSVGExporter       dotSVGExporter
+}
+
+func newHTTPRequestHandler(
 	componentGraphReader componentGraphReader,
 	dotSVGExporter dotSVGExporter,
-) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, _ *http.Request) {
-		conf, initialComponentGraph, err := componentGraphReader.ReadComponentGraph()
-		if err != nil {
-			w.Write([]byte(err.Error()))
-
-			return
-		}
-
-		componentGraph, err := component.ApplyGraphConfig(conf, initialComponentGraph)
-		if err != nil {
-			w.Write([]byte(err.Error()))
-
-			return
-		}
-
-		dotSVGGraph, err := dotSVGExporter.ExportSVG(componentGraph)
-		if err != nil {
-			w.Write([]byte(err.Error()))
-
-			return
-		}
-
-		w.Write(dotSVGGraph)
+) *httpRequestHandler {
+	return &httpRequestHandler{
+		componentGraphReader: componentGraphReader,
+		dotSVGExporter:       dotSVGExporter,
 	}
+}
+
+func (h *httpRequestHandler) handle(w http.ResponseWriter, _ *http.Request) {
+	conf, initialComponentGraph, err := h.componentGraphReader.ReadComponentGraph()
+	if err != nil {
+		w.Write([]byte(err.Error()))
+
+		return
+	}
+
+	componentGraph, err := component.ApplyGraphConfig(conf, initialComponentGraph)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+
+		return
+	}
+
+	dotSVGGraph, err := h.dotSVGExporter.ExportSVG(componentGraph)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+
+		return
+	}
+
+	w.Write(dotSVGGraph)
 }
