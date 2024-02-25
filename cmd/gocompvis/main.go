@@ -2,16 +2,10 @@ package main
 
 import (
 	"fmt"
-	"go/ast"
-	"go/parser"
-	"go/token"
 	"os"
-	"path/filepath"
 
-	"github.com/ilya2049/gocomponent/internal/cliapp"
-	"github.com/ilya2049/gocomponent/internal/component"
-	"github.com/ilya2049/gocomponent/internal/config"
-	"github.com/ilya2049/gocomponent/internal/fs"
+	"github.com/ilya2049/gocomponent/internal/app/cliapp"
+	"github.com/ilya2049/gocomponent/internal/infra/fs"
 
 	"github.com/urfave/cli/v2"
 )
@@ -56,7 +50,7 @@ func newApp() *cli.App {
 func runHTTPServer(cCtx *cli.Context) error {
 	serverPort := cCtx.String("port")
 
-	server := cliapp.NewHTTPServer(serverPort, readComponentGraph)
+	server := cliapp.NewHTTPServer(serverPort, fs.ReadComponentGraph)
 
 	fmt.Println("Server started at " + server.Addr)
 
@@ -64,7 +58,7 @@ func runHTTPServer(cCtx *cli.Context) error {
 }
 
 func printDotGraph(*cli.Context) error {
-	conf, initialComponentGraph, err := readComponentGraph()
+	conf, initialComponentGraph, err := fs.ReadComponentGraph()
 	if err != nil {
 		return err
 	}
@@ -73,47 +67,10 @@ func printDotGraph(*cli.Context) error {
 }
 
 func printNamespaces(*cli.Context) error {
-	conf, initialComponentGraph, err := readComponentGraph()
+	conf, initialComponentGraph, err := fs.ReadComponentGraph()
 	if err != nil {
 		return err
 	}
 
 	return cliapp.PrintNamespaces(conf, initialComponentGraph)
-}
-
-func readComponentGraph() (*component.GraphConfig, *component.Graph, error) {
-	conf, err := config.Read()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	fsWalker := fs.NewWalk(conf.ProjectDirectory, &fileReader{}, &filePathWalker{}, &astFileParser{})
-
-	initialComponentGraph, err := fsWalker.ReadComponentGraph()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return conf.ToComponentGraphConfig(), initialComponentGraph, nil
-}
-
-type fileReader struct {
-}
-
-func (r *fileReader) ReadFile(name string) ([]byte, error) {
-	return os.ReadFile(name)
-}
-
-type filePathWalker struct {
-}
-
-func (w *filePathWalker) Walk(root string, fn filepath.WalkFunc) error {
-	return filepath.Walk(root, fn)
-}
-
-type astFileParser struct {
-}
-
-func (p *astFileParser) ParseFile(fset *token.FileSet, filename string, src any, mode parser.Mode) (f *ast.File, err error) {
-	return parser.ParseFile(fset, filename, src, mode)
 }

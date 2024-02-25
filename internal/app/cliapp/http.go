@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/goccy/go-graphviz"
-	"github.com/ilya2049/gocomponent/internal/component"
-	"github.com/ilya2049/gocomponent/internal/dot"
+	"github.com/ilya2049/gocomponent/internal/app/dot"
+	"github.com/ilya2049/gocomponent/internal/domain/component"
 )
 
 type readComponentGraphFunc func() (*component.GraphConfig, *component.Graph, error)

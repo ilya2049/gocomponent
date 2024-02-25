@@ -3,7 +3,7 @@ package cliapp
 import (
 	"fmt"
 
-	"github.com/ilya2049/gocomponent/internal/component"
+	"github.com/ilya2049/gocomponent/internal/domain/component"
 )
 
 func PrintNamespaces(conf *component.GraphConfig, initialComponentGraph *component.Graph) error {

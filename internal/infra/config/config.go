@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/BurntSushi/toml"
-	"github.com/ilya2049/gocomponent/internal/component"
+	"github.com/ilya2049/gocomponent/internal/domain/component"
 )
 
 type Config struct {

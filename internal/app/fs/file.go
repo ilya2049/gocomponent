@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"github.com/ilya2049/gocomponent/internal/component"
+	"github.com/ilya2049/gocomponent/internal/domain/component"
 )
 
 var (

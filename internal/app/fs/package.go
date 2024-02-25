@@ -1,6 +1,6 @@
 package fs
 
-import "github.com/ilya2049/gocomponent/internal/component"
+import "github.com/ilya2049/gocomponent/internal/domain/component"
 
 type projectPackage struct {
 	*component.Component

@@ -3,8 +3,8 @@ package cliapp
 import (
 	"fmt"
 
-	"github.com/ilya2049/gocomponent/internal/component"
-	"github.com/ilya2049/gocomponent/internal/dot"
+	"github.com/ilya2049/gocomponent/internal/app/dot"
+	"github.com/ilya2049/gocomponent/internal/domain/component"
 )
 
 func PrintDotGraph(conf *component.GraphConfig, initialComponentGraph *component.Graph) error {
