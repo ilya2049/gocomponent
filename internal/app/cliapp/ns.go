@@ -18,12 +18,7 @@ func NewNamespacePrinter(destination io.Writer) *NamespacePrinter {
 	}
 }
 
-func (p *NamespacePrinter) PrintNamespaces(conf *component.GraphConfig, initialComponentGraph *component.Graph) error {
-	componentGraph, err := component.ApplyGraphConfig(conf, initialComponentGraph)
-	if err != nil {
-		return err
-	}
-
+func (p *NamespacePrinter) PrintNamespaces(componentGraph *component.Graph) error {
 	sb := strings.Builder{}
 
 	components := componentGraph.Components()

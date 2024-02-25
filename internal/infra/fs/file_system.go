@@ -15,10 +15,10 @@ import (
 type ComponentGraphReader struct {
 }
 
-func (r *ComponentGraphReader) ReadComponentGraph() (*component.GraphConfig, *component.Graph, error) {
+func (r *ComponentGraphReader) ReadComponentGraph() (*component.Graph, error) {
 	conf, err := config.Read()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	fsWalk := fs.NewWalk(
@@ -30,10 +30,15 @@ func (r *ComponentGraphReader) ReadComponentGraph() (*component.GraphConfig, *co
 
 	initialComponentGraph, err := fsWalk.ReadComponentGraph()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return conf.ToComponentGraphConfig(), initialComponentGraph, nil
+	componentGraph, err := component.ApplyGraphConfig(conf.ToComponentGraphConfig(), initialComponentGraph)
+	if err != nil {
+		return nil, err
+	}
+
+	return componentGraph, nil
 }
 
 type fileReader struct {

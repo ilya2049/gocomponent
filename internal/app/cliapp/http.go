@@ -7,7 +7,7 @@ import (
 )
 
 type componentGraphReader interface {
-	ReadComponentGraph() (*component.GraphConfig, *component.Graph, error)
+	ReadComponentGraph() (*component.Graph, error)
 }
 
 const defaultHTTPServerPort = "8080"
@@ -52,14 +52,7 @@ func newHTTPRequestHandler(
 }
 
 func (h *httpRequestHandler) handle(w http.ResponseWriter, _ *http.Request) {
-	conf, initialComponentGraph, err := h.componentGraphReader.ReadComponentGraph()
-	if err != nil {
-		w.Write([]byte(err.Error()))
-
-		return
-	}
-
-	componentGraph, err := component.ApplyGraphConfig(conf, initialComponentGraph)
+	componentGraph, err := h.componentGraphReader.ReadComponentGraph()
 	if err != nil {
 		w.Write([]byte(err.Error()))
 

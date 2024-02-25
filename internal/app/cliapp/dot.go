@@ -27,12 +27,7 @@ func NewDotGraphPrinter(dotExporter dotExporter, destination io.Writer) *DotGrap
 	}
 }
 
-func (p *DotGraphPrinter) PrintDotGraph(conf *component.GraphConfig, initialComponentGraph *component.Graph) error {
-	componentGraph, err := component.ApplyGraphConfig(conf, initialComponentGraph)
-	if err != nil {
-		return err
-	}
-
+func (p *DotGraphPrinter) PrintDotGraph(componentGraph *component.Graph) error {
 	fmt.Fprintln(p.destination, p.dotExporter.Export(componentGraph))
 
 	return nil
