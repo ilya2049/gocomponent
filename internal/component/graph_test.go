@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGenerateGraph(t *testing.T) {
+func TestApplyGraphConfig(t *testing.T) {
 	// Given
 	conf := component.GraphConfig{
 		IncludeThirdPartyComponents: true,
@@ -40,7 +40,7 @@ func TestGenerateGraph(t *testing.T) {
 	internalPkg := component.New(component.NewNamespace("/internal/pkg"))
 	netHttp := component.New(component.NewNamespace("net/http"))
 
-	g := component.NewGraph(component.Imports{
+	initialGraph := component.NewGraph(component.Imports{
 		component.NewImport(cmdMain, appUser),
 		component.NewImport(cmdMain, appProduct),
 		component.NewImport(internalPostgresql, domainUser),
@@ -52,10 +52,8 @@ func TestGenerateGraph(t *testing.T) {
 		component.NewImport(internalPkg, netHttp),
 	})
 
-	fsWalker := newFsWalkerStub(g)
-
 	// When
-	generatedComponentGraph, err := component.GenerateGraph(&conf, fsWalker)
+	generatedComponentGraph, err := component.ApplyGraphConfig(&conf, initialGraph)
 	require.NoError(t, err)
 
 	// Then

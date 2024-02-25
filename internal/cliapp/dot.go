@@ -20,7 +20,12 @@ func PrintDotGraph() error {
 
 	fsWalker := fs.NewWalk(conf.ProjectDirectory, prj)
 
-	componentGraph, err := component.GenerateGraph(conf.ToComponentGraphConfig(), fsWalker)
+	initialComponentGraph, err := fsWalker.CreateComponentGraph()
+	if err != nil {
+		return err
+	}
+
+	componentGraph, err := component.ApplyGraphConfig(conf.ToComponentGraphConfig(), initialComponentGraph)
 	if err != nil {
 		return err
 	}

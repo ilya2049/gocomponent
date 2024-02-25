@@ -44,7 +44,14 @@ func handleHTTPRequest(w http.ResponseWriter, _ *http.Request) {
 
 	fsWalker := fs.NewWalk(conf.ProjectDirectory, prj)
 
-	componentGraph, err := component.GenerateGraph(conf.ToComponentGraphConfig(), fsWalker)
+	initialComponentGraph, err := fsWalker.CreateComponentGraph()
+	if err != nil {
+		w.Write([]byte(err.Error()))
+
+		return
+	}
+
+	componentGraph, err := component.ApplyGraphConfig(conf.ToComponentGraphConfig(), initialComponentGraph)
 	if err != nil {
 		w.Write([]byte(err.Error()))
 

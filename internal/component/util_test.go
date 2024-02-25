@@ -29,17 +29,3 @@ func getComponentIDs(g *component.Graph) []string {
 func areComponentsEqual(component1, component2 *component.Component) bool {
 	return component1.Namespace().String() == component2.Namespace().String()
 }
-
-type FsWalkerStub struct {
-	componentGraph *component.Graph
-}
-
-func newFsWalkerStub(componentGraph *component.Graph) *FsWalkerStub {
-	return &FsWalkerStub{
-		componentGraph: componentGraph,
-	}
-}
-
-func (w *FsWalkerStub) CreateComponentGraph() (*component.Graph, error) {
-	return w.componentGraph, nil
-}

@@ -18,16 +18,7 @@ type GraphConfig struct {
 	ComponentColors             map[Namespace]Color
 }
 
-type fsWalker interface {
-	CreateComponentGraph() (*Graph, error)
-}
-
-func GenerateGraph(conf *GraphConfig, walker fsWalker) (*Graph, error) {
-	componentGraph, err := walker.CreateComponentGraph()
-	if err != nil {
-		return nil, err
-	}
-
+func ApplyGraphConfig(conf *GraphConfig, componentGraph *Graph) (*Graph, error) {
 	if !conf.IncludeThirdPartyComponents {
 		componentGraph = componentGraph.RemoveThirdPartyComponents()
 	}
