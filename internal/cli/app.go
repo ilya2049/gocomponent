@@ -3,9 +3,12 @@ package cli
 import (
 	"fmt"
 
+	"github.com/ilya2049/gocomponent/internal/config"
 	"github.com/ilya2049/gocomponent/internal/dot"
+	"github.com/ilya2049/gocomponent/internal/fs"
 	"github.com/ilya2049/gocomponent/internal/generator"
 	"github.com/ilya2049/gocomponent/internal/httpserver"
+	"github.com/ilya2049/gocomponent/internal/project"
 
 	"github.com/urfave/cli/v2"
 )
@@ -55,7 +58,16 @@ func runHTTPServer(cCtx *cli.Context) error {
 }
 
 func printDotGraph(cCtx *cli.Context) error {
-	componentGraph, err := generator.GenerateGraph()
+	conf, err := config.Read()
+	if err != nil {
+		return err
+	}
+
+	prj := project.New()
+
+	fsWalker := fs.NewWalk(conf.ProjectDirectory, prj)
+
+	componentGraph, err := generator.GenerateGraph(conf, fsWalker)
 	if err != nil {
 		return err
 	}
@@ -66,7 +78,16 @@ func printDotGraph(cCtx *cli.Context) error {
 }
 
 func printNamespaces(cCtx *cli.Context) error {
-	componentGraph, err := generator.GenerateGraph()
+	conf, err := config.Read()
+	if err != nil {
+		return err
+	}
+
+	prj := project.New()
+
+	fsWalker := fs.NewWalk(conf.ProjectDirectory, prj)
+
+	componentGraph, err := generator.GenerateGraph(conf, fsWalker)
 	if err != nil {
 		return err
 	}

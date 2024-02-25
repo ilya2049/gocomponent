@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/ilya2049/gocomponent/internal/component"
-	"github.com/ilya2049/gocomponent/internal/component/testutil"
+	"github.com/ilya2049/gocomponent/internal/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

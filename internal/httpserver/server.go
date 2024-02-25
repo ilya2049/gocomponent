@@ -5,8 +5,11 @@ import (
 	"net/http"
 
 	"github.com/goccy/go-graphviz"
+	"github.com/ilya2049/gocomponent/internal/config"
 	"github.com/ilya2049/gocomponent/internal/dot"
+	"github.com/ilya2049/gocomponent/internal/fs"
 	"github.com/ilya2049/gocomponent/internal/generator"
+	"github.com/ilya2049/gocomponent/internal/project"
 )
 
 func New(address string) *http.Server {
@@ -17,7 +20,18 @@ func New(address string) *http.Server {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		componentGraph, err := generator.GenerateGraph()
+		conf, err := config.Read()
+		if err != nil {
+			w.Write([]byte(err.Error()))
+
+			return
+		}
+
+		prj := project.New()
+
+		fsWalker := fs.NewWalk(conf.ProjectDirectory, prj)
+
+		componentGraph, err := generator.GenerateGraph(conf, fsWalker)
 		if err != nil {
 			w.Write([]byte(err.Error()))
 

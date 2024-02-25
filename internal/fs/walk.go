@@ -28,10 +28,10 @@ func NewWalk(projectDir string, prj *project.Project) *Walk {
 	}
 }
 
-func (w *Walk) FindComponentsAndImports() error {
+func (w *Walk) CreateComponentGraph() (*component.Graph, error) {
 	moduleName, err := readModuleName(w.projectDir)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = filepath.Walk(w.projectDir, func(path string, info os.FileInfo, err error) error {
@@ -69,10 +69,10 @@ func (w *Walk) FindComponentsAndImports() error {
 	})
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return w.project.CreateComponentGraph(), nil
 }
 
 func (w *Walk) isRootNamespace(namespace component.Namespace) bool {

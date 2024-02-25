@@ -3,34 +3,20 @@ package generator
 import (
 	"github.com/ilya2049/gocomponent/internal/component"
 	"github.com/ilya2049/gocomponent/internal/config"
-	"github.com/ilya2049/gocomponent/internal/fs"
-	"github.com/ilya2049/gocomponent/internal/project"
 )
 
-func GenerateGraph() (*component.Graph, error) {
-	conf, err := config.Read()
+type fsWalker interface {
+	CreateComponentGraph() (*component.Graph, error)
+}
+
+func GenerateGraph(conf *config.Config, walker fsWalker) (*component.Graph, error) {
+	componentGraph, err := walker.CreateComponentGraph()
 	if err != nil {
 		return nil, err
 	}
 
-	project := project.New()
-
-	walk := fs.NewWalk(conf.ProjectDirectory, project)
-
-	if err := walk.FindComponentsAndImports(); err != nil {
-		return nil, err
-	}
-
-	componentGraph := project.CreateComponentGraph()
-
 	if !conf.IncludeThirdPartyComponents {
 		componentGraph = componentGraph.RemoveThirdPartyComponents()
-	}
-
-	if len(conf.CustomComponents) > 0 {
-		componentGraph = componentGraph.CreateCustomComponents(
-			component.NewNamespaces(conf.CustomComponents),
-		)
 	}
 
 	if len(conf.IncludeParentComponents) > 0 {
@@ -54,6 +40,12 @@ func GenerateGraph() (*component.Graph, error) {
 	if len(conf.ExcludeChildComponents) > 0 {
 		componentGraph = componentGraph.ExcludeChildComponents(
 			component.NewNamespaces(conf.ExcludeChildComponents),
+		)
+	}
+
+	if len(conf.CustomComponents) > 0 {
+		componentGraph = componentGraph.CreateCustomComponents(
+			component.NewNamespaces(conf.CustomComponents),
 		)
 	}
 
