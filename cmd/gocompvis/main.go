@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/ilya2049/gocomponent/internal/cliapp"
 	"github.com/ilya2049/gocomponent/internal/component"
@@ -83,7 +84,7 @@ func readComponentGraph() (*component.GraphConfig, *component.Graph, error) {
 		return nil, nil, err
 	}
 
-	fsWalker := fs.NewWalk(conf.ProjectDirectory)
+	fsWalker := fs.NewWalk(conf.ProjectDirectory, &fileReader{}, &filePathWalker{})
 
 	initialComponentGraph, err := fsWalker.ReadComponentGraph()
 	if err != nil {
@@ -91,4 +92,18 @@ func readComponentGraph() (*component.GraphConfig, *component.Graph, error) {
 	}
 
 	return conf.ToComponentGraphConfig(), initialComponentGraph, nil
+}
+
+type fileReader struct {
+}
+
+func (r *fileReader) ReadFile(name string) ([]byte, error) {
+	return os.ReadFile(name)
+}
+
+type filePathWalker struct {
+}
+
+func (w *filePathWalker) Walk(root string, fn filepath.WalkFunc) error {
+	return filepath.Walk(root, fn)
 }

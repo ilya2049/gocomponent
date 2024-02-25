@@ -1,39 +1,47 @@
 package fs
 
 import (
+	"errors"
 	"fmt"
 	"go/parser"
 	"go/token"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/ilya2049/gocomponent/internal/component"
 )
 
 type Walk struct {
-	projectDir string
-	project    *project
+	fileReader     fileReader
+	filePathWalker filePathWalker
+	projectDir     string
+	project        *project
 }
 
-func NewWalk(projectDir string) *Walk {
+func NewWalk(
+	projectDir string,
+	fileReader fileReader,
+	filePathWalker filePathWalker,
+) *Walk {
 	if !strings.HasSuffix(projectDir, component.Slash) {
 		projectDir += component.Slash
 	}
 
 	return &Walk{
-		projectDir: projectDir,
-		project:    newProject(),
+		projectDir:     projectDir,
+		project:        newProject(),
+		fileReader:     fileReader,
+		filePathWalker: filePathWalker,
 	}
 }
 
 func (w *Walk) ReadComponentGraph() (*component.Graph, error) {
-	moduleName, err := readModuleName(w.projectDir)
+	moduleName, err := w.readModuleName(w.projectDir)
 	if err != nil {
 		return nil, err
 	}
 
-	err = filepath.Walk(w.projectDir, func(path string, info os.FileInfo, err error) error {
+	err = w.filePathWalker.Walk(w.projectDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return fmt.Errorf("walk err: %w", err)
 		}
@@ -120,4 +128,32 @@ func (w *Walk) parseImportsOfGoFile(
 	}
 
 	return imports, nil
+}
+
+var ErrFirstLineOfGoModShouldIncludeExactlyTwoPArts = errors.New(
+	"the first line of go mod file parts should includes exactly two parts",
+)
+
+func (w *Walk) readModuleName(projectDir string) (string, error) {
+	goModFileContents, err := w.fileReader.ReadFile(projectDir + "go.mod")
+	if err != nil {
+		return "", fmt.Errorf("read go.mod: %w", err)
+	}
+
+	var firstLineOfGoModFile = []byte{}
+
+	for _, b := range goModFileContents {
+		if b == '\n' {
+			break
+		} else {
+			firstLineOfGoModFile = append(firstLineOfGoModFile, b)
+		}
+	}
+
+	firstLineOfGoModFileParts := strings.Split(string(firstLineOfGoModFile), " ")
+	if len(firstLineOfGoModFileParts) != 2 {
+		return "", ErrFirstLineOfGoModShouldIncludeExactlyTwoPArts
+	}
+
+	return firstLineOfGoModFileParts[1], nil
 }
