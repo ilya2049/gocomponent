@@ -3,6 +3,7 @@ package fs
 import (
 	"testing"
 
+	"github.com/ilya2049/gocomponent/internal/domain/component"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -62,6 +63,36 @@ func Test_isHidden(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equal(t, tt.want, isHidden(tt.path))
+		})
+	}
+}
+
+func Test_findNamespaceInPath(t *testing.T) {
+	tests := []struct {
+		name          string
+		path          string
+		wantNamespace component.Namespace
+		wantOk        bool
+	}{
+		{
+			name:          "A .go file has a namespace",
+			path:          "internal/domain/component/color.go",
+			wantNamespace: "internal/domain/component",
+			wantOk:        true,
+		},
+		{
+			name:          "Not a .go file has not a namespace",
+			path:          "internal/domain/component/color.yaml",
+			wantNamespace: "",
+			wantOk:        false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			namespace, ok := findNamespaceInPath(tt.path)
+
+			assert.Equal(t, tt.wantNamespace, namespace)
+			assert.Equal(t, tt.wantOk, ok)
 		})
 	}
 }
