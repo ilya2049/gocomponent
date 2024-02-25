@@ -6,6 +6,7 @@ import (
 	"go/token"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/ilya2049/gocomponent/internal/domain/component"
 )
@@ -35,4 +36,8 @@ func findNamespaceInPath(path string) (component.Namespace, bool) {
 
 func isGoSourceFile(path string) bool {
 	return goFileRegexp.MatchString(path)
+}
+
+func isHidden(path string) bool {
+	return strings.HasPrefix(path, ".")
 }

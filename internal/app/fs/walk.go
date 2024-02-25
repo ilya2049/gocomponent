@@ -50,6 +50,10 @@ func (w *Walk) ReadComponentGraph() (*component.Graph, error) {
 			return fmt.Errorf("walk err: %w", err)
 		}
 
+		if isHidden(path) {
+			return nil
+		}
+
 		if !isGoSourceFile(path) {
 			return nil
 		}
