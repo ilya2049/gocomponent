@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/ilya2049/gocomponent/internal/component"
-	"github.com/ilya2049/gocomponent/internal/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -53,14 +52,14 @@ func TestGenerateGraph(t *testing.T) {
 		component.NewImport(internalPkg, netHttp),
 	})
 
-	fsWalker := testutil.NewFsWalkerStub(g)
+	fsWalker := newFsWalkerStub(g)
 
 	// When
 	generatedComponentGraph, err := component.GenerateGraph(&conf, fsWalker)
 	require.NoError(t, err)
 
 	// Then
-	wantGeneratedComponentGraphString := testutil.BuildGraphString(
+	wantGeneratedComponentGraphString := buildGraphString(
 		"/internal/app/product -> /internal/domain/product",
 		"/internal/domain/product -> /internal/pkg",
 		"/internal/pkg -> net/http",
@@ -123,7 +122,7 @@ func TestGraph_MakeUniqueComponentIDs(t *testing.T) {
 			g.MakeUniqueComponentIDs()
 
 			// Then
-			componentIDs := testutil.GetComponentIDs(g)
+			componentIDs := getComponentIDs(g)
 
 			assert.ElementsMatch(t, tt.wantComponentIDs, componentIDs)
 		})
@@ -154,7 +153,7 @@ func TestGraph_CreateCustomComponents(t *testing.T) {
 				})
 			},
 			customComponents: []string{"user"},
-			wantGraphString: testutil.BuildGraphString(
+			wantGraphString: buildGraphString(
 				"user -> /pkg",
 				"/cmd/main -> user",
 			),
@@ -176,7 +175,7 @@ func TestGraph_CreateCustomComponents(t *testing.T) {
 				})
 			},
 			customComponents: []string{"/postgresql"},
-			wantGraphString: testutil.BuildGraphString(
+			wantGraphString: buildGraphString(
 				"/postgresql -> /pkg",
 				"/cmd/main -> /postgresql",
 			),
@@ -194,7 +193,7 @@ func TestGraph_CreateCustomComponents(t *testing.T) {
 				})
 			},
 			customComponents: []string{"/mongodb"},
-			wantGraphString: testutil.BuildGraphString(
+			wantGraphString: buildGraphString(
 				"/cmd/main -> /postgresql/user",
 				"/postgresql/user -> /pkg",
 			),
@@ -236,7 +235,7 @@ func TestGraph_String(t *testing.T) {
 					component.NewImport(domainUser, pkg),
 				})
 			},
-			wantGraphString: testutil.BuildGraphString(
+			wantGraphString: buildGraphString(
 				"/cmd/main -> /postgresql/user",
 				"/cmd/main -> /domain/user",
 				"/postgresql/user -> /domain/user",
@@ -301,7 +300,7 @@ func TestGraph_ExtendComponentIDs(t *testing.T) {
 			require.NoError(t, err)
 
 			// Then
-			componentIDs := testutil.GetComponentIDs(g)
+			componentIDs := getComponentIDs(g)
 
 			assert.ElementsMatch(t, tt.wantComponentIDs, componentIDs)
 		})
@@ -350,7 +349,7 @@ func TestGraph_ExcludeChildComponents(t *testing.T) {
 			componentsToExclude: component.NewNamespaces([]string{
 				"/domain/user",
 			}),
-			wantGraphString: testutil.BuildGraphString(
+			wantGraphString: buildGraphString(
 				"/domain/user -> /pkg",
 			),
 		},
@@ -369,7 +368,7 @@ func TestGraph_ExcludeChildComponents(t *testing.T) {
 			componentsToExclude: component.NewNamespaces([]string{
 				"user",
 			}),
-			wantGraphString: testutil.BuildGraphString(
+			wantGraphString: buildGraphString(
 				"/domain/user -> /pkg",
 			),
 		},
@@ -408,7 +407,7 @@ func TestGraph_ExcludeParentComponents(t *testing.T) {
 			componentsToExclude: component.NewNamespaces([]string{
 				"/domain/user",
 			}),
-			wantGraphString: testutil.BuildGraphString(
+			wantGraphString: buildGraphString(
 				"/cmd/main -> /domain/user",
 			),
 		},
@@ -427,7 +426,7 @@ func TestGraph_ExcludeParentComponents(t *testing.T) {
 			componentsToExclude: component.NewNamespaces([]string{
 				"user",
 			}),
-			wantGraphString: testutil.BuildGraphString(
+			wantGraphString: buildGraphString(
 				"/cmd/main -> /domain/user",
 			),
 		},
@@ -466,7 +465,7 @@ func TestGraph_IncludeChildComponents(t *testing.T) {
 			componentsToInclude: component.NewNamespaces([]string{
 				"/domain/user",
 			}),
-			wantGraphString: testutil.BuildGraphString(
+			wantGraphString: buildGraphString(
 				"/cmd/main -> /domain/user",
 			),
 		},
@@ -485,7 +484,7 @@ func TestGraph_IncludeChildComponents(t *testing.T) {
 			componentsToInclude: component.NewNamespaces([]string{
 				"user",
 			}),
-			wantGraphString: testutil.BuildGraphString(
+			wantGraphString: buildGraphString(
 				"/cmd/main -> /domain/user",
 			),
 		},
@@ -524,7 +523,7 @@ func TestGraph_IncludeParentComponents(t *testing.T) {
 			componentsToInclude: component.NewNamespaces([]string{
 				"/domain/user",
 			}),
-			wantGraphString: testutil.BuildGraphString(
+			wantGraphString: buildGraphString(
 				"/domain/user -> /pkg",
 			),
 		},
@@ -543,7 +542,7 @@ func TestGraph_IncludeParentComponents(t *testing.T) {
 			componentsToInclude: component.NewNamespaces([]string{
 				"user",
 			}),
-			wantGraphString: testutil.BuildGraphString(
+			wantGraphString: buildGraphString(
 				"/domain/user -> /pkg",
 			),
 		},
@@ -577,7 +576,7 @@ func TestGraph_RemoveThirdPartyComponents(t *testing.T) {
 	g = g.RemoveThirdPartyComponents()
 
 	// Then
-	wantGraphString := testutil.BuildGraphString(
+	wantGraphString := buildGraphString(
 		"/cmd/main -> /domain/user",
 		"/domain/user -> /pkg",
 	)
@@ -631,11 +630,11 @@ func TestGraph_Colorize(t *testing.T) {
 
 	// Then
 	for _, aComponent := range g.Components() {
-		if testutil.AreComponentsEqual(aComponent, main) {
+		if areComponentsEqual(aComponent, main) {
 			assert.Equal(t, redColor, aComponent.Color().String())
 		}
 
-		if testutil.AreComponentsEqual(aComponent, thirdParty) {
+		if areComponentsEqual(aComponent, thirdParty) {
 			assert.Equal(t, blueColor, aComponent.Color().String())
 		}
 	}

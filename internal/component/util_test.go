@@ -1,4 +1,4 @@
-package testutil
+package component_test
 
 import (
 	"strings"
@@ -6,7 +6,7 @@ import (
 	"github.com/ilya2049/gocomponent/internal/component"
 )
 
-func BuildGraphString(imports ...string) string {
+func buildGraphString(imports ...string) string {
 	sb := strings.Builder{}
 
 	for _, imp := range imports {
@@ -16,7 +16,7 @@ func BuildGraphString(imports ...string) string {
 	return sb.String()
 }
 
-func GetComponentIDs(g *component.Graph) []string {
+func getComponentIDs(g *component.Graph) []string {
 	var componentIDs []string
 
 	for _, c := range g.Components() {
@@ -26,7 +26,7 @@ func GetComponentIDs(g *component.Graph) []string {
 	return componentIDs
 }
 
-func AreComponentsEqual(component1, component2 *component.Component) bool {
+func areComponentsEqual(component1, component2 *component.Component) bool {
 	return component1.Namespace().String() == component2.Namespace().String()
 }
 
@@ -34,7 +34,7 @@ type FsWalkerStub struct {
 	componentGraph *component.Graph
 }
 
-func NewFsWalkerStub(componentGraph *component.Graph) *FsWalkerStub {
+func newFsWalkerStub(componentGraph *component.Graph) *FsWalkerStub {
 	return &FsWalkerStub{
 		componentGraph: componentGraph,
 	}
