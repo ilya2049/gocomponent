@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/BurntSushi/toml"
+	"github.com/ilya2049/gocomponent/internal/component"
 )
 
 type Config struct {
@@ -18,6 +19,20 @@ type Config struct {
 	ExcludeChildComponents      []string          `toml:"exclude_children"`
 	CustomComponents            []string          `toml:"custom"`
 	ComponentColors             map[string]string `toml:"colors"`
+}
+
+func (conf *Config) ToComponentGraphConfig() *component.GraphConfig {
+	return &component.GraphConfig{
+		ExtendComponentIDs:          conf.ExtendComponentIDs,
+		IncludeThirdPartyComponents: conf.IncludeThirdPartyComponents,
+		ThirdPartyComponentsColor:   component.NewColor(conf.ThirdPartyComponentsColor),
+		IncludeParentComponents:     component.NewNamespaces(conf.IncludeParentComponents),
+		IncludeChildComponents:      component.NewNamespaces(conf.IncludeChildComponents),
+		ExcludeParentComponents:     component.NewNamespaces(conf.ExcludeParentComponents),
+		ExcludeChildComponents:      component.NewNamespaces(conf.ExcludeChildComponents),
+		CustomComponents:            component.NewNamespaces(conf.CustomComponents),
+		ComponentColors:             component.NewNamespaceColorMap(conf.ComponentColors),
+	}
 }
 
 func Read() (*Config, error) {

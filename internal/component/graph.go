@@ -6,6 +6,81 @@ import (
 	"strings"
 )
 
+type GraphConfig struct {
+	ExtendComponentIDs          map[string]int
+	IncludeThirdPartyComponents bool
+	ThirdPartyComponentsColor   Color
+	IncludeParentComponents     Namespaces
+	IncludeChildComponents      Namespaces
+	ExcludeParentComponents     Namespaces
+	ExcludeChildComponents      Namespaces
+	CustomComponents            Namespaces
+	ComponentColors             map[Namespace]Color
+}
+
+type fsWalker interface {
+	CreateComponentGraph() (*Graph, error)
+}
+
+func GenerateGraph(conf *GraphConfig, walker fsWalker) (*Graph, error) {
+	componentGraph, err := walker.CreateComponentGraph()
+	if err != nil {
+		return nil, err
+	}
+
+	if !conf.IncludeThirdPartyComponents {
+		componentGraph = componentGraph.RemoveThirdPartyComponents()
+	}
+
+	if len(conf.IncludeParentComponents) > 0 {
+		componentGraph = componentGraph.IncludeParentComponents(
+			conf.IncludeParentComponents,
+		)
+	}
+
+	if len(conf.IncludeChildComponents) > 0 {
+		componentGraph = componentGraph.IncludeChildComponents(
+			conf.IncludeChildComponents,
+		)
+	}
+
+	if len(conf.ExcludeParentComponents) > 0 {
+		componentGraph = componentGraph.ExcludeParentComponents(
+			conf.ExcludeParentComponents,
+		)
+	}
+
+	if len(conf.ExcludeChildComponents) > 0 {
+		componentGraph = componentGraph.ExcludeChildComponents(
+			conf.ExcludeChildComponents,
+		)
+	}
+
+	if len(conf.CustomComponents) > 0 {
+		componentGraph = componentGraph.CreateCustomComponents(
+			conf.CustomComponents,
+		)
+	}
+
+	if len(conf.ComponentColors) > 0 {
+		componentGraph.Colorize(conf.ComponentColors)
+	}
+
+	if conf.ThirdPartyComponentsColor != "" {
+		componentGraph.ColorizeThirdParty(conf.ThirdPartyComponentsColor)
+	}
+
+	componentGraph.MakeUniqueComponentIDs()
+
+	if len(conf.ExtendComponentIDs) > 0 {
+		if err := componentGraph.ExtendComponentIDs(conf.ExtendComponentIDs); err != nil {
+			return nil, err
+		}
+	}
+
+	return componentGraph, nil
+}
+
 type Graph struct {
 	components map[Namespace]*Component
 

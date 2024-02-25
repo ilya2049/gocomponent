@@ -9,6 +9,67 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestGenerateGraph(t *testing.T) {
+	// Given
+	conf := component.GraphConfig{
+		IncludeThirdPartyComponents: true,
+		IncludeParentComponents: component.NewNamespaces([]string{
+			"/internal",
+			"net/http",
+		}),
+		IncludeChildComponents: component.NewNamespaces([]string{
+			"/internal",
+			"net/http",
+		}),
+		ExcludeParentComponents: component.NewNamespaces([]string{
+			"/internal/postgresql",
+		}),
+		ExcludeChildComponents: component.NewNamespaces([]string{
+			"/internal/postgresql",
+		}),
+		CustomComponents: component.NewNamespaces([]string{
+			"user",
+		}),
+	}
+
+	cmdMain := component.New(component.NewNamespace("/cmd/main"))
+	internalPostgresql := component.New(component.NewNamespace("/internal/postgresql"))
+	domainUser := component.New(component.NewNamespace("/internal/domain/user"))
+	domainProduct := component.New(component.NewNamespace("/internal/domain/product"))
+	appUser := component.New(component.NewNamespace("/internal/app/user"))
+	appProduct := component.New(component.NewNamespace("/internal/app/product"))
+	internalPkg := component.New(component.NewNamespace("/internal/pkg"))
+	netHttp := component.New(component.NewNamespace("net/http"))
+
+	g := component.NewGraph(component.Imports{
+		component.NewImport(cmdMain, appUser),
+		component.NewImport(cmdMain, appProduct),
+		component.NewImport(internalPostgresql, domainUser),
+		component.NewImport(appUser, domainUser),
+		component.NewImport(internalPostgresql, domainProduct),
+		component.NewImport(appProduct, domainProduct),
+		component.NewImport(domainUser, internalPkg),
+		component.NewImport(domainProduct, internalPkg),
+		component.NewImport(internalPkg, netHttp),
+	})
+
+	fsWalker := testutil.NewFsWalkerStub(g)
+
+	// When
+	generatedComponentGraph, err := component.GenerateGraph(&conf, fsWalker)
+	require.NoError(t, err)
+
+	// Then
+	wantGeneratedComponentGraphString := testutil.BuildGraphString(
+		"/internal/app/product -> /internal/domain/product",
+		"/internal/domain/product -> /internal/pkg",
+		"/internal/pkg -> net/http",
+		"user -> /internal/pkg",
+	)
+
+	assert.Equal(t, wantGeneratedComponentGraphString, generatedComponentGraph.String())
+}
+
 func TestGraph_MakeUniqueComponentIDs(t *testing.T) {
 	tests := []struct {
 		name             string

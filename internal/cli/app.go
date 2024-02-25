@@ -3,10 +3,10 @@ package cli
 import (
 	"fmt"
 
+	"github.com/ilya2049/gocomponent/internal/component"
 	"github.com/ilya2049/gocomponent/internal/config"
 	"github.com/ilya2049/gocomponent/internal/dot"
 	"github.com/ilya2049/gocomponent/internal/fs"
-	"github.com/ilya2049/gocomponent/internal/generator"
 	"github.com/ilya2049/gocomponent/internal/httpserver"
 	"github.com/ilya2049/gocomponent/internal/project"
 
@@ -67,7 +67,7 @@ func printDotGraph(cCtx *cli.Context) error {
 
 	fsWalker := fs.NewWalk(conf.ProjectDirectory, prj)
 
-	componentGraph, err := generator.GenerateGraph(conf, fsWalker)
+	componentGraph, err := component.GenerateGraph(conf.ToComponentGraphConfig(), fsWalker)
 	if err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func printNamespaces(cCtx *cli.Context) error {
 
 	fsWalker := fs.NewWalk(conf.ProjectDirectory, prj)
 
-	componentGraph, err := generator.GenerateGraph(conf, fsWalker)
+	componentGraph, err := component.GenerateGraph(conf.ToComponentGraphConfig(), fsWalker)
 	if err != nil {
 		return err
 	}
