@@ -1,11 +1,8 @@
 package cliapp
 
 import (
-	"bytes"
 	"net/http"
 
-	"github.com/goccy/go-graphviz"
-	"github.com/ilya2049/gocomponent/internal/app/dot"
 	"github.com/ilya2049/gocomponent/internal/domain/component"
 )
 
@@ -13,7 +10,11 @@ type readComponentGraphFunc func() (*component.GraphConfig, *component.Graph, er
 
 const defaultHTTPServerPort = "8080"
 
-func NewHTTPServer(port string, readComponentGraph readComponentGraphFunc) *http.Server {
+func NewHTTPServer(
+	port string,
+	readComponentGraph readComponentGraphFunc,
+	dotSVGExporter dotSVGExporter,
+) *http.Server {
 	if port == "" {
 		port = defaultHTTPServerPort
 	}
@@ -24,14 +25,17 @@ func NewHTTPServer(port string, readComponentGraph readComponentGraphFunc) *http
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/", handleHTTPRequest(readComponentGraph))
+	mux.HandleFunc("/", handleHTTPRequest(readComponentGraph, dotSVGExporter))
 
 	server.Handler = mux
 
 	return &server
 }
 
-func handleHTTPRequest(readComponentGraph readComponentGraphFunc) func(http.ResponseWriter, *http.Request) {
+func handleHTTPRequest(
+	readComponentGraph readComponentGraphFunc,
+	dotSVGExporter dotSVGExporter,
+) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, _ *http.Request) {
 		conf, initialComponentGraph, err := readComponentGraph()
 		if err != nil {
@@ -47,24 +51,13 @@ func handleHTTPRequest(readComponentGraph readComponentGraphFunc) func(http.Resp
 			return
 		}
 
-		dotGraph := dot.Export(componentGraph)
-
-		parsedDotGraph, err := graphviz.ParseBytes([]byte(dotGraph))
+		dotSVGGraph, err := dotSVGExporter.ExportSVG(componentGraph)
 		if err != nil {
 			w.Write([]byte(err.Error()))
 
 			return
 		}
 
-		var svgGraph bytes.Buffer
-
-		graph := graphviz.New()
-		if err := graph.Render(parsedDotGraph, graphviz.SVG, &svgGraph); err != nil {
-			w.Write([]byte(err.Error()))
-
-			return
-		}
-
-		w.Write(dot.MapComponentAndNamespaceInSVG(componentGraph.Components(), svgGraph.Bytes()))
+		w.Write(dotSVGGraph)
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/ilya2049/gocomponent/internal/app/cliapp"
+	"github.com/ilya2049/gocomponent/internal/infra/dot"
 	"github.com/ilya2049/gocomponent/internal/infra/fs"
 
 	"github.com/urfave/cli/v2"
@@ -50,7 +51,7 @@ func newApp() *cli.App {
 func runHTTPServer(cCtx *cli.Context) error {
 	serverPort := cCtx.String("port")
 
-	server := cliapp.NewHTTPServer(serverPort, fs.ReadComponentGraph)
+	server := cliapp.NewHTTPServer(serverPort, fs.ReadComponentGraph, &dot.Exporter{})
 
 	fmt.Println("Server started at " + server.Addr)
 
@@ -63,7 +64,7 @@ func printDotGraph(*cli.Context) error {
 		return err
 	}
 
-	return cliapp.PrintDotGraph(conf, initialComponentGraph)
+	return cliapp.PrintDotGraph(conf, initialComponentGraph, &dot.Exporter{})
 }
 
 func printNamespaces(*cli.Context) error {
