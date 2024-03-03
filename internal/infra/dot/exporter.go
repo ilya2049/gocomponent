@@ -2,6 +2,7 @@ package dot
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 
 	"github.com/goccy/go-graphviz"
@@ -21,10 +22,15 @@ func (e *Exporter) Export(g *component.Graph) string {
 
 		if component.HasColor() {
 			componentString += " [shape=component, style=filled, fillcolor=" +
-				component.Color().String() + "]\n"
+				component.Color().String()
 		} else {
-			componentString += " [shape=component]\n"
+			componentString += " [shape=component"
 		}
+
+		size := fmt.Sprintf(" width=%.2f height=%.2f", component.NormalizedSize(), component.NormalizedSize())
+
+		componentString += size
+		componentString += " ]\n"
 
 		sb.WriteString(componentString)
 	}

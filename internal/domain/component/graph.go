@@ -3,6 +3,7 @@ package component
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 )
 
@@ -27,6 +28,14 @@ func ApplyGraphConfig(conf *GraphConfig, componentGraph *Graph) (*Graph, error) 
 		componentGraph = componentGraph.IncludeParentAndChildComponents(
 			conf.IncludeParentComponents, conf.IncludeChildComponents,
 		)
+	} else {
+		if len(conf.IncludeParentComponents) > 0 {
+			componentGraph = componentGraph.IncludeParentComponents(conf.IncludeParentComponents)
+		}
+
+		if len(conf.IncludeChildComponents) > 0 {
+			componentGraph = componentGraph.IncludeChildComponents(conf.IncludeChildComponents)
+		}
 	}
 
 	if len(conf.ExcludeParentComponents) > 0 {
@@ -56,6 +65,7 @@ func ApplyGraphConfig(conf *GraphConfig, componentGraph *Graph) (*Graph, error) 
 	}
 
 	componentGraph.MakeUniqueComponentIDs()
+	componentGraph.NormalizeComponentSizes()
 
 	if len(conf.ExtendComponentIDs) > 0 {
 		if err := componentGraph.ExtendComponentIDs(conf.ExtendComponentIDs); err != nil {
@@ -120,6 +130,40 @@ func (g *Graph) MakeUniqueComponentIDs() {
 		} else {
 			firstComponent.ExtendID()
 		}
+	}
+}
+
+func (g *Graph) NormalizeComponentSizes() {
+	const minNormalizeSize = 0.1
+
+	components := g.Components()
+
+	if len(components) == 0 {
+		for _, component := range components {
+			component.NormalizeSize(minNormalizeSize)
+		}
+
+		return
+	}
+
+	componentWithMaxSize := slices.MaxFunc(components, func(a, b *Component) int {
+		return a.SizeBytes() - b.SizeBytes()
+	})
+
+	componentWithMinSize := slices.MinFunc(components, func(a, b *Component) int {
+		return a.SizeBytes() - b.SizeBytes()
+	})
+
+	maxMinDifference := componentWithMaxSize.SizeBytes() - componentWithMinSize.SizeBytes()
+
+	for _, component := range components {
+		normalizedSize := float64((component.SizeBytes() - componentWithMinSize.SizeBytes())) / float64(maxMinDifference)
+
+		if normalizedSize < minNormalizeSize {
+			normalizedSize = minNormalizeSize
+		}
+
+		component.NormalizeSize(normalizedSize)
 	}
 }
 

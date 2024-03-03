@@ -19,7 +19,7 @@ func main() {
 
 func newApp() *cli.App {
 	return &cli.App{
-		Name:  "gocompvis",
+		Name:  "gocomponent",
 		Usage: "Visualize your project components and their connections",
 		Commands: []*cli.Command{
 			{

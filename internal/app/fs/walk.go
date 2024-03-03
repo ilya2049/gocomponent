@@ -71,7 +71,7 @@ func (w *Walk) ReadComponentGraph() (*component.Graph, error) {
 
 		aComponent := w.project.getOrAddComponent(namespace)
 
-		packageImports, err := w.parseImportsOfGoFile(namespace, moduleName, path)
+		packageImports, err := w.parseImportsAndCountBytesOfGoFile(aComponent, moduleName, path)
 		if err != nil {
 			return err
 		}
@@ -113,14 +113,18 @@ func (w *Walk) addPackageInProject(namespace component.Namespace, newPackage *pr
 	w.project.addPackage(namespace, newPackage)
 }
 
-func (w *Walk) parseImportsOfGoFile(
-	currentNamespace component.Namespace,
+func (w *Walk) parseImportsAndCountBytesOfGoFile(
+	currentComponent *component.Component,
 	moduleName string,
 	goFileName string,
 ) (map[component.Namespace]*component.Component, error) {
 	file, err := w.astFileParser.ParseFile(token.NewFileSet(), goFileName, nil, parser.Mode(0))
 	if err != nil {
 		return nil, fmt.Errorf("parse a .go file: %w", err)
+	}
+
+	if !strings.HasSuffix(goFileName, "_test.go") {
+		currentComponent.AddBytesInSize(int(file.FileEnd) - int(file.FileStart))
 	}
 
 	imports := make(map[component.Namespace]*component.Component)
@@ -134,7 +138,7 @@ func (w *Walk) parseImportsOfGoFile(
 			namespace = namespace.TrimPrefix(moduleName)
 		}
 
-		if namespace == currentNamespace {
+		if namespace == currentComponent.Namespace() {
 			continue
 		}
 
