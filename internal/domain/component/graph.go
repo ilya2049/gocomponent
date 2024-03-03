@@ -23,15 +23,9 @@ func ApplyGraphConfig(conf *GraphConfig, componentGraph *Graph) (*Graph, error) 
 		componentGraph = componentGraph.RemoveThirdPartyComponents()
 	}
 
-	if len(conf.IncludeParentComponents) > 0 {
-		componentGraph = componentGraph.IncludeParentComponents(
-			conf.IncludeParentComponents,
-		)
-	}
-
-	if len(conf.IncludeChildComponents) > 0 {
-		componentGraph = componentGraph.IncludeChildComponents(
-			conf.IncludeChildComponents,
+	if len(conf.IncludeParentComponents) > 0 && len(conf.IncludeChildComponents) > 0 {
+		componentGraph = componentGraph.IncludeParentAndChildComponents(
+			conf.IncludeParentComponents, conf.IncludeChildComponents,
 		)
 	}
 
@@ -180,7 +174,21 @@ func (g *Graph) RemoveThirdPartyComponents() *Graph {
 	return NewGraph(newImports)
 }
 
+func (g *Graph) IncludeParentAndChildComponents(
+	parentComponentNamespaces Namespaces,
+	childComponentNamespaces Namespaces,
+) *Graph {
+	parentComponentImports := g.includeParentComponentImports(parentComponentNamespaces)
+	childComponentImports := g.includeChildComponentImports(childComponentNamespaces)
+
+	return NewGraph(append(parentComponentImports, childComponentImports...))
+}
+
 func (g *Graph) IncludeParentComponents(namespaces Namespaces) *Graph {
+	return NewGraph(g.includeParentComponentImports(namespaces))
+}
+
+func (g *Graph) includeParentComponentImports(namespaces Namespaces) Imports {
 	newImports := make(Imports, 0)
 
 	for _, imp := range g.Imports() {
@@ -193,10 +201,14 @@ func (g *Graph) IncludeParentComponents(namespaces Namespaces) *Graph {
 		}
 	}
 
-	return NewGraph(newImports)
+	return newImports
 }
 
 func (g *Graph) IncludeChildComponents(namespaces Namespaces) *Graph {
+	return NewGraph(g.includeChildComponentImports(namespaces))
+}
+
+func (g *Graph) includeChildComponentImports(namespaces Namespaces) Imports {
 	newImports := make(Imports, 0)
 
 	for _, imp := range g.Imports() {
@@ -209,7 +221,7 @@ func (g *Graph) IncludeChildComponents(namespaces Namespaces) *Graph {
 		}
 	}
 
-	return NewGraph(newImports)
+	return newImports
 }
 
 func (g *Graph) ExcludeParentComponents(namespaces Namespaces) *Graph {
@@ -260,7 +272,7 @@ func (g *Graph) createCustomComponent(namespace Namespace) *Graph {
 
 	newImports := make(Imports, 0)
 
-	for _, imp := range g.imports {
+	for _, imp := range g.Imports() {
 		if imp.from.namespace.Contains(namespace) && imp.to.namespace.Contains(namespace) {
 			continue
 		}

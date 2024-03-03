@@ -62,7 +62,12 @@ func TestApplyGraphConfig(t *testing.T) {
 		"/internal/app/product -> /internal/domain/product",
 		"/internal/domain/product -> /internal/pkg",
 		"/internal/pkg -> net/http",
+		"/cmd/main -> /internal/app/product",
+		"/internal/app/product -> /internal/domain/product",
+		"/internal/domain/product -> /internal/pkg",
+		"/internal/pkg -> net/http",
 		"user -> /internal/pkg",
+		"/cmd/main -> user",
 	)
 
 	assert.Equal(t, wantGeneratedComponentGraphString, generatedComponentGraph.String())
@@ -637,4 +642,32 @@ func TestGraph_Colorize(t *testing.T) {
 			assert.Equal(t, blueColor, aComponent.Color().String())
 		}
 	}
+}
+
+func TestGraph_IncludeParentAndChildComponents(t *testing.T) {
+	// Given
+	main := component.New(component.NewNamespace("/cmd/main"))
+	domainUser := component.New(component.NewNamespace("/domain/user"))
+	pkg := component.New(component.NewNamespace("/pkg"))
+	githubLib := component.New(component.NewNamespace("github.com/user/lib"))
+
+	g := component.NewGraph(component.Imports{
+		component.NewImport(main, domainUser),
+		component.NewImport(domainUser, pkg),
+		component.NewImport(pkg, githubLib),
+	})
+
+	// When
+	g = g.IncludeParentAndChildComponents(
+		component.NewNamespaces([]string{"/domain/user"}),
+		component.NewNamespaces([]string{"/domain/user"}),
+	)
+
+	// Then
+	wantGraphString := sbuilder.BuildMultilineString(
+		"/domain/user -> /pkg",
+		"/cmd/main -> /domain/user",
+	)
+
+	assert.Equal(t, wantGraphString, g.String())
 }
