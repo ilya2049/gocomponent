@@ -1,12 +1,16 @@
 package config
 
 import (
+	"errors"
 	"fmt"
+	"os"
 
 	"github.com/BurntSushi/toml"
 	"github.com/ilya2049/gocomponent/internal/domain/component"
 	"github.com/ilya2049/gocomponent/internal/pkg/fs"
 )
+
+const defaultConfigFileName = "config.toml"
 
 type Config struct {
 	ProjectDirectory            string            `toml:"project_directory"`
@@ -19,6 +23,20 @@ type Config struct {
 	ExcludeChildComponents      []string          `toml:"exclude_children"`
 	CustomComponents            []string          `toml:"custom"`
 	ComponentColors             map[string]string `toml:"colors"`
+}
+
+func (c *Config) makeSureProjectDirIsSet() {
+	if c.ProjectDirectory == "" {
+		c.ProjectDirectory = "./"
+	}
+}
+
+func newDefault() *Config {
+	conf := Config{}
+
+	conf.makeSureProjectDirIsSet()
+
+	return &conf
 }
 
 func (conf *Config) ToComponentGraphConfig() *component.GraphConfig {
@@ -45,9 +63,17 @@ func NewReader(fileReader fs.FileReader) *Reader {
 	}
 }
 
-func (r *Reader) ReadConfig() (*Config, error) {
-	configContents, err := r.fileReader.ReadFile("config.toml")
+func (r *Reader) ReadConfig(configFileName string) (*Config, error) {
+	if configFileName == "" {
+		configFileName = defaultConfigFileName
+	}
+
+	configContents, err := r.fileReader.ReadFile(configFileName)
 	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return newDefault(), nil
+		}
+
 		return nil, fmt.Errorf("read config: %w", err)
 	}
 
@@ -55,6 +81,8 @@ func (r *Reader) ReadConfig() (*Config, error) {
 	if _, err := toml.Decode(string(configContents), &conf); err != nil {
 		return nil, fmt.Errorf("decode config: %w", err)
 	}
+
+	conf.makeSureProjectDirIsSet()
 
 	return &conf, nil
 }
