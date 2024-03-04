@@ -44,13 +44,13 @@ sbuilder
 
 ```
 # Пространства имен
-/internal/sbuilder
+/internal/fs
+/internal/cliapp/fs
 /internal/pkg/sbuilder
-/internal/pkg/util
 
 # Идентификаторы компонентов
-/internal/sbuilder
-pkg/sbuilder
-util
+/internal/fs
+cliapp/fs
+sbuilder
 ```
 
