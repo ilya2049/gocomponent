@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/ilya2049/gocomponent/internal/domain/component"
+	"github.com/ilya2049/gocomponent/internal/component"
 )
 
 type dotExporter interface {

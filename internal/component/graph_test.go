@@ -3,7 +3,7 @@ package component_test
 import (
 	"testing"
 
-	"github.com/ilya2049/gocomponent/internal/domain/component"
+	"github.com/ilya2049/gocomponent/internal/component"
 	"github.com/ilya2049/gocomponent/internal/pkg/sbuilder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

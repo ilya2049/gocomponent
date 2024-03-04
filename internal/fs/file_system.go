@@ -7,9 +7,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ilya2049/gocomponent/internal/app/fs"
-	"github.com/ilya2049/gocomponent/internal/domain/component"
-	"github.com/ilya2049/gocomponent/internal/infra/config"
+	"github.com/ilya2049/gocomponent/internal/cliapp/fs"
+	"github.com/ilya2049/gocomponent/internal/component"
+	"github.com/ilya2049/gocomponent/internal/config"
 )
 
 type ComponentGraphReader struct {

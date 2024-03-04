@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ilya2049/gocomponent/internal/domain/component"
+	"github.com/ilya2049/gocomponent/internal/component"
 	"github.com/ilya2049/gocomponent/internal/pkg/fs"
 )
 

@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/goccy/go-graphviz"
-	"github.com/ilya2049/gocomponent/internal/domain/component"
+	"github.com/ilya2049/gocomponent/internal/component"
 )
 
 type Exporter struct {

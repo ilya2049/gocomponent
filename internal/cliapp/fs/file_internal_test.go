@@ -3,7 +3,7 @@ package fs
 import (
 	"testing"
 
-	"github.com/ilya2049/gocomponent/internal/domain/component"
+	"github.com/ilya2049/gocomponent/internal/component"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -77,7 +77,7 @@ func Test_findNamespaceInPath(t *testing.T) {
 		{
 			name:          "A .go file has a namespace",
 			path:          "internal/domain/component/color.go",
-			wantNamespace: "internal/domain/component",
+			wantNamespace: "internal/component",
 			wantOk:        true,
 		},
 		{

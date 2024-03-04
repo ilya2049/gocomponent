@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ilya2049/gocomponent/internal/app/cliapp"
-	"github.com/ilya2049/gocomponent/internal/infra/dot"
-	"github.com/ilya2049/gocomponent/internal/infra/fs"
+	"github.com/ilya2049/gocomponent/internal/cliapp"
+	"github.com/ilya2049/gocomponent/internal/dot"
+	"github.com/ilya2049/gocomponent/internal/fs"
 
 	"github.com/urfave/cli/v2"
 )

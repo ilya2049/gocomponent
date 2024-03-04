@@ -1,6 +1,6 @@
 package fs
 
-import "github.com/ilya2049/gocomponent/internal/domain/component"
+import "github.com/ilya2049/gocomponent/internal/component"
 
 type project struct {
 	packages map[component.Namespace]*projectPackage

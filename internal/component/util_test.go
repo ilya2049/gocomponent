@@ -1,7 +1,7 @@
 package component_test
 
 import (
-	"github.com/ilya2049/gocomponent/internal/domain/component"
+	"github.com/ilya2049/gocomponent/internal/component"
 )
 
 func getComponentIDs(g *component.Graph) []string {
