@@ -68,4 +68,8 @@ func (c *Component) NormalizedSize() float64 {
 	return c.normalizedSize
 }
 
+func (c *Component) IsSizeNormalized() bool {
+	return c.normalizedSize > 0
+}
+
 type Components []*Component

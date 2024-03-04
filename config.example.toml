@@ -2,6 +2,7 @@ project_directory = './'
 
 include_third_party = true
 third_party_color = 'orange'
+enable_size = true
 
 include_parents = [
     'fs',
@@ -26,6 +27,8 @@ exclude_children = [
 custom = [
     'domain'
 ]
+
+
 
 [colors]
 'dot' = 'red'

@@ -27,9 +27,12 @@ func (e *Exporter) Export(g *component.Graph) string {
 			componentString += " [shape=component"
 		}
 
-		size := fmt.Sprintf(" width=%.2f height=%.2f", component.NormalizedSize(), component.NormalizedSize())
+		if component.IsSizeNormalized() {
+			size := fmt.Sprintf(" width=%.2f height=%.2f", component.NormalizedSize(), component.NormalizedSize())
 
-		componentString += size
+			componentString += size
+		}
+
 		componentString += " ]\n"
 
 		sb.WriteString(componentString)

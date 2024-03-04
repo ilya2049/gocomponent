@@ -17,6 +17,7 @@ type GraphConfig struct {
 	ExcludeChildComponents      Namespaces
 	CustomComponents            Namespaces
 	ComponentColors             map[Namespace]Color
+	EnableComponentSize         bool
 }
 
 func ApplyGraphConfig(conf *GraphConfig, componentGraph *Graph) (*Graph, error) {
@@ -65,7 +66,10 @@ func ApplyGraphConfig(conf *GraphConfig, componentGraph *Graph) (*Graph, error) 
 	}
 
 	componentGraph.MakeUniqueComponentIDs()
-	componentGraph.NormalizeComponentSizes()
+
+	if conf.EnableComponentSize {
+		componentGraph.NormalizeComponentSizes()
+	}
 
 	if len(conf.ExtendComponentIDs) > 0 {
 		if err := componentGraph.ExtendComponentIDs(conf.ExtendComponentIDs); err != nil {
@@ -139,10 +143,6 @@ func (g *Graph) NormalizeComponentSizes() {
 	components := g.Components()
 
 	if len(components) == 0 {
-		for _, component := range components {
-			component.NormalizeSize(minNormalizeSize)
-		}
-
 		return
 	}
 

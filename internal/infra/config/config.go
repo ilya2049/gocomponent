@@ -23,6 +23,7 @@ type Config struct {
 	ExcludeChildComponents      []string          `toml:"exclude_children"`
 	CustomComponents            []string          `toml:"custom"`
 	ComponentColors             map[string]string `toml:"colors"`
+	EnableComponentSize         bool              `toml:"enable_size"`
 }
 
 func (c *Config) makeSureProjectDirIsSet() {
@@ -50,6 +51,7 @@ func (conf *Config) ToComponentGraphConfig() *component.GraphConfig {
 		ExcludeChildComponents:      component.NewNamespaces(conf.ExcludeChildComponents),
 		CustomComponents:            component.NewNamespaces(conf.CustomComponents),
 		ComponentColors:             component.NewNamespaceColorMap(conf.ComponentColors),
+		EnableComponentSize:         conf.EnableComponentSize,
 	}
 }
 
