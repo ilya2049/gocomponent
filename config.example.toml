@@ -5,33 +5,27 @@ third_party_color = 'orange'
 enable_size = true
 
 include_parents = [
-    'fs',
-    'dot'
+    '/internal'
 ]
 
 include_children = [
-    'fs',
-    'dot'
+    '/internal'
 ]
 
 exclude_parents = [
-    'fs',
-    'dot'
+    '/internal/legacy'
 ]
 
 exclude_children = [
-    'fs',
-    'dot'
+    '/internal/legacy'
 ]
 
 custom = [
-    'domain'
+    'user'
 ]
 
-
-
 [colors]
-'dot' = 'red'
+'user' = 'blue'
 
 [extend_ids]
 'v\d+$' = 2
