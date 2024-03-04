@@ -15,10 +15,10 @@ import (
 type ComponentGraphReader struct {
 }
 
-func (r *ComponentGraphReader) ReadComponentGraph(configFileName string) (*component.Graph, error) {
+func (r *ComponentGraphReader) ReadComponentGraph() (*component.Graph, error) {
 	configReader := config.NewReader(&fileReader{})
 
-	conf, err := configReader.ReadConfig(configFileName)
+	conf, err := configReader.ReadConfig()
 	if err != nil {
 		return nil, err
 	}

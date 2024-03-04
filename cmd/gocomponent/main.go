@@ -61,7 +61,7 @@ func runHTTPServer(cCtx *cli.Context) error {
 func printDotGraph(*cli.Context) error {
 	componentGraphReader := &fs.ComponentGraphReader{}
 
-	componentGraph, err := componentGraphReader.ReadComponentGraph("")
+	componentGraph, err := componentGraphReader.ReadComponentGraph()
 	if err != nil {
 		return err
 	}
@@ -74,7 +74,7 @@ func printDotGraph(*cli.Context) error {
 func printNamespaces(*cli.Context) error {
 	componentGraphReader := &fs.ComponentGraphReader{}
 
-	componentGraph, err := componentGraphReader.ReadComponentGraph("")
+	componentGraph, err := componentGraphReader.ReadComponentGraph()
 	if err != nil {
 		return err
 	}

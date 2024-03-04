@@ -65,12 +65,8 @@ func NewReader(fileReader fs.FileReader) *Reader {
 	}
 }
 
-func (r *Reader) ReadConfig(configFileName string) (*Config, error) {
-	if configFileName == "" {
-		configFileName = defaultConfigFileName
-	}
-
-	configContents, err := r.fileReader.ReadFile(configFileName)
+func (r *Reader) ReadConfig() (*Config, error) {
+	configContents, err := r.fileReader.ReadFile(defaultConfigFileName)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return newDefault(), nil

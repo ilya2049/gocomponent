@@ -2,13 +2,12 @@ package cliapp
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/ilya2049/gocomponent/internal/component"
 )
 
 type componentGraphReader interface {
-	ReadComponentGraph(configFileName string) (*component.Graph, error)
+	ReadComponentGraph() (*component.Graph, error)
 }
 
 const defaultHTTPServerPort = "8080"
@@ -53,7 +52,7 @@ func newHTTPRequestHandler(
 }
 
 func (h *httpRequestHandler) handle(w http.ResponseWriter, r *http.Request) {
-	componentGraph, err := h.componentGraphReader.ReadComponentGraph(h.getConfigFileName(r))
+	componentGraph, err := h.componentGraphReader.ReadComponentGraph()
 	if err != nil {
 		w.Write([]byte(err.Error()))
 
@@ -68,16 +67,4 @@ func (h *httpRequestHandler) handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(dotSVGGraph)
-}
-
-func (h *httpRequestHandler) getConfigFileName(r *http.Request) string {
-	requestURISections := strings.Split(r.RequestURI, "/")
-
-	var configFileName string
-
-	if secondRequestURISection := requestURISections[1]; secondRequestURISection != "" {
-		configFileName = secondRequestURISection + ".toml"
-	}
-
-	return configFileName
 }
