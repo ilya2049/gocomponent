@@ -24,9 +24,7 @@ func (p *NamespacePrinter) PrintNamespaces(componentGraph *component.Graph) erro
 	components := componentGraph.Components()
 
 	for i, component := range components {
-		sb.WriteString(fmt.Sprintf("%s [%s] %d B",
-			component.Namespace(), component.ID(), component.SizeBytes(),
-		))
+		sb.WriteString(fmt.Sprintf("%s [%s]", component.Namespace(), component.ID()))
 
 		if i < len(components)-1 {
 			sb.WriteRune('\n')
