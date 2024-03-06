@@ -313,6 +313,7 @@ func (g *Graph) CreateCustomComponents(namespaces Namespaces) *Graph {
 func (g *Graph) createCustomComponent(namespace Namespace) *Graph {
 	childrenOfCustomComponent := make(map[Namespace]*Component)
 	parentsOfCustomComponent := make(map[Namespace]*Component)
+	componentsToMergeInCustomComponent := make(map[Namespace]*Component)
 
 	newImports := make(Imports, 0)
 
@@ -322,12 +323,16 @@ func (g *Graph) createCustomComponent(namespace Namespace) *Graph {
 		}
 
 		if imp.from.namespace.Contains(namespace) {
+			componentsToMergeInCustomComponent[imp.from.namespace] = imp.from
+
 			childrenOfCustomComponent[imp.to.namespace] = imp.to
 
 			continue
 		}
 
 		if imp.to.namespace.Contains(namespace) {
+			componentsToMergeInCustomComponent[imp.to.namespace] = imp.to
+
 			parentsOfCustomComponent[imp.from.namespace] = imp.from
 
 			continue
@@ -337,6 +342,10 @@ func (g *Graph) createCustomComponent(namespace Namespace) *Graph {
 	}
 
 	customComponent := New(namespace)
+
+	for _, componentToMergeInCustomComponent := range componentsToMergeInCustomComponent {
+		customComponent.AddBytesInSize(componentToMergeInCustomComponent.SizeBytes())
+	}
 
 	for _, childOfCustomComponent := range childrenOfCustomComponent {
 		newImports = append(newImports, NewImport(customComponent, childOfCustomComponent))
