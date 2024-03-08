@@ -176,6 +176,12 @@ func (g *Graph) ExtendComponentIDs(idRegexpPatternAndSections map[string]int) er
 
 		for _, component := range g.components {
 			if r.MatchString(component.Namespace().String()) {
+				if sections <= 0 {
+					component.UseNamespaceAsID()
+
+					continue
+				}
+
 				for i := 0; i < sections; i++ {
 					component.ExtendID()
 				}

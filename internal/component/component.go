@@ -28,6 +28,10 @@ func (c *Component) ExtendID() {
 	c.id = c.namespace.ExtendComponentID(c.id)
 }
 
+func (c *Component) UseNamespaceAsID() {
+	c.id = c.namespace.String()
+}
+
 func (c *Component) ID() string {
 	return c.id
 }
