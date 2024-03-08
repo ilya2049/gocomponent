@@ -145,6 +145,24 @@ include_children = [
 ![custom_component_before](./docs/img/custom_component_before.png)
 ![custom_component](./docs/img/custom_component.png)
 
+### Пользовательский компонент из маркер-секции
+
+Чтобы объединить в пользовательский компонент пакеты, в пространствах имен которых есть определенная секция, достаточно в конфигурационном списке `custom` указать эту секцию.
+
+```
+project_directory = '/path/to/project'
+
+custom = [
+    'user'
+]
+
+[colors]
+'user' = 'gray'
+```
+
+![custom_component_by_marker_before](./docs/img/custom_component_by_marker_before.png)
+![custom_component_by_marker](./docs/img/custom_component_by_marker.png)
+
 ### Как связаны между собой слои приложения?
 
 Допустим, в приложении три основных слоя: domain, app и infra. Все .go-файлы располагаются в соответствующих пакетах. В граф компонентов включаются только соответствующе пространства имен (include_parents, include_children). Все go-файлы в слоях объединяются в пользовательские компоненты (custom). Чтобы сравнить объем исходного кода в слоях приложения, активирована настройка enable_size.
