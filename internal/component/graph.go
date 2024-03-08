@@ -278,12 +278,18 @@ func (g *Graph) ExcludeParentComponents(namespaces Namespaces) *Graph {
 	newImports := make(Imports, 0)
 
 	for _, imp := range g.Imports() {
+		includeImport := true
+
 		for _, namespace := range namespaces {
-			if !imp.from.namespace.Contains(namespace) {
-				newImports = append(newImports, imp)
+			if imp.from.namespace.Contains(namespace) {
+				includeImport = false
 
 				continue
 			}
+		}
+
+		if includeImport {
+			newImports = append(newImports, imp)
 		}
 	}
 
@@ -294,12 +300,18 @@ func (g *Graph) ExcludeChildComponents(namespaces Namespaces) *Graph {
 	newImports := make(Imports, 0)
 
 	for _, imp := range g.Imports() {
+		includeImport := true
+
 		for _, namespace := range namespaces {
-			if !imp.to.namespace.Contains(namespace) {
-				newImports = append(newImports, imp)
+			if imp.to.namespace.Contains(namespace) {
+				includeImport = false
 
 				continue
 			}
+		}
+
+		if includeImport {
+			newImports = append(newImports, imp)
 		}
 	}
 

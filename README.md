@@ -114,6 +114,23 @@ include_parents = [
 
 ![imported_third_party](./docs/img/imported_third_party.png)
 
+### Исключение компонента
+
+```
+project_directory = '/path/to/project'
+
+exclude_parents = [
+    '/internal/component'
+]
+
+exclude_children = [
+    '/internal/component'
+]
+```
+
+![exclude_before](./docs/img/exclude_before.png)
+![exclude](./docs/img/exclude.png)
+
 ### Расширение идентификатора компонента
 
 Часто случается так, что идентификатор компонента, вычисленный автоматически, малоинформативен. Есть возможность указать количество дополнительных секций, которые добавятся к идентификатору. В примере ниже в идентификатор компонента 'v2' добавляется одна дополнительная секция. Здесь 'v\d+$' - это регулярное выражение, которое разбирается с помощью пакета 'regexp'.
@@ -144,6 +161,16 @@ project_directory = '/path/to/project'
 
 ![ns_as_id](./docs/img/ns_as_id.png)
 
+### Относительный размер компонентов
+
+```
+project_directory = '/path/to/project'
+
+enable_size = true
+```
+
+![component_size](./docs/img/component_size.png)
+
 ### Пользовательский компонент
 
 Пусть в некотором проекте помимо прочих есть следующие пространства имен:
@@ -159,14 +186,6 @@ project_directory = '/path/to/project'
 project_directory = '/path/to/project'
 
 custom = [
-    '/internal/app'
-]
-
-include_parents = [
-    '/internal/app'
-]
-
-include_children = [
     '/internal/app'
 ]
 
