@@ -16,6 +16,7 @@ type GraphConfig struct {
 	ExcludeParentComponents     Namespaces
 	ExcludeChildComponents      Namespaces
 	CustomComponents            Namespaces
+	OnlyComponents              Namespaces
 	ComponentColors             map[Namespace]Color
 	EnableComponentSize         bool
 }
@@ -55,6 +56,10 @@ func ApplyGraphConfig(conf *GraphConfig, componentGraph *Graph) (*Graph, error) 
 		componentGraph = componentGraph.CreateCustomComponents(
 			conf.CustomComponents,
 		)
+	}
+
+	if len(conf.OnlyComponents) > 0 {
+		componentGraph = componentGraph.IncludeOnlyComponents(conf.OnlyComponents)
 	}
 
 	if len(conf.ComponentColors) > 0 {
@@ -332,6 +337,31 @@ func (g *Graph) ExcludeChildComponents(namespaces Namespaces) *Graph {
 		}
 
 		if includeImport {
+			newImports = append(newImports, imp)
+		}
+	}
+
+	return NewGraph(newImports)
+}
+
+func (g *Graph) IncludeOnlyComponents(namespaces Namespaces) *Graph {
+	newImports := make(Imports, 0)
+
+	for _, imp := range g.Imports() {
+		fromComponentInNamespace := false
+		toComponentInNamespace := false
+
+		for _, namespace := range namespaces {
+			if imp.From().Namespace().Contains(namespace) {
+				fromComponentInNamespace = true
+			}
+
+			if imp.To().Namespace().Contains(namespace) {
+				toComponentInNamespace = true
+			}
+		}
+
+		if fromComponentInNamespace && toComponentInNamespace {
 			newImports = append(newImports, imp)
 		}
 	}

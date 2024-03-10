@@ -22,6 +22,7 @@ type Config struct {
 	ExcludeParentComponents     []string          `toml:"exclude_parents"`
 	ExcludeChildComponents      []string          `toml:"exclude_children"`
 	CustomComponents            []string          `toml:"custom"`
+	OnlyComponents              []string          `toml:"only"`
 	ComponentColors             map[string]string `toml:"colors"`
 	EnableComponentSize         bool              `toml:"enable_size"`
 }
@@ -50,6 +51,7 @@ func (conf *Config) ToComponentGraphConfig() *component.GraphConfig {
 		ExcludeParentComponents:     component.NewNamespaces(conf.ExcludeParentComponents),
 		ExcludeChildComponents:      component.NewNamespaces(conf.ExcludeChildComponents),
 		CustomComponents:            component.NewNamespaces(conf.CustomComponents),
+		OnlyComponents:              component.NewNamespaces(conf.OnlyComponents),
 		ComponentColors:             component.NewNamespaceColorMap(conf.ComponentColors),
 		EnableComponentSize:         conf.EnableComponentSize,
 	}
