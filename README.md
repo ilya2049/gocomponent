@@ -7,7 +7,7 @@
 Установка
 
 ```
-go install github.com/ilya2049/gocomponent/cmd/gocomponent
+go install github.com/ilya2049/gocomponent/cmd/gocomponent@latest
 ```
 
 В корневой директории проекта (там, где находится `go.mod`) введите
