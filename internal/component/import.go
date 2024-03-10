@@ -20,4 +20,8 @@ func (i *Import) To() *Component {
 	return i.to
 }
 
+func (i *Import) String() string {
+	return i.From().Namespace().String() + " -> " + i.To().Namespace().String()
+}
+
 type Imports []*Import

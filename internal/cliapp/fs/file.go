@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	namespaceRegexp = regexp.MustCompile(`(.*)/.*\.go`)
+	namespaceRegexp = regexp.MustCompile(`(.*)\/.*\.go`)
 	goFileRegexp    = regexp.MustCompile(`^.*\.go$`)
 )
 

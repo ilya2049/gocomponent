@@ -77,7 +77,7 @@ func Test_findNamespaceInPath(t *testing.T) {
 		{
 			name:          "A .go file has a namespace",
 			path:          "internal/domain/component/color.go",
-			wantNamespace: "internal/component",
+			wantNamespace: "internal/domain/component",
 			wantOk:        true,
 		},
 		{

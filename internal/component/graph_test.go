@@ -63,9 +63,6 @@ func TestApplyGraphConfig(t *testing.T) {
 		"/internal/domain/product -> /internal/pkg",
 		"/internal/pkg -> net/http",
 		"/cmd/main -> /internal/app/product",
-		"/internal/app/product -> /internal/domain/product",
-		"/internal/domain/product -> /internal/pkg",
-		"/internal/pkg -> net/http",
 		"user -> /internal/pkg",
 		"/cmd/main -> user",
 	)

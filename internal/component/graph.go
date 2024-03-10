@@ -88,8 +88,17 @@ type Graph struct {
 
 func NewGraph(imports Imports) *Graph {
 	componentsMap := make(map[Namespace]*Component)
+	importsMap := make(map[string]*Import)
+	newImports := make(Imports, 0)
 
 	for _, imp := range imports {
+		if _, ok := importsMap[imp.String()]; ok {
+			continue
+		}
+
+		importsMap[imp.String()] = imp
+		newImports = append(newImports, imp)
+
 		componentsMap[imp.from.namespace] = imp.from
 		componentsMap[imp.to.namespace] = imp.to
 	}
@@ -97,7 +106,7 @@ func NewGraph(imports Imports) *Graph {
 	return &Graph{
 		components: componentsMap,
 
-		imports: imports,
+		imports: newImports,
 	}
 }
 
@@ -242,12 +251,18 @@ func (g *Graph) includeParentComponentImports(namespaces Namespaces) Imports {
 	newImports := make(Imports, 0)
 
 	for _, imp := range g.Imports() {
+		includeImport := false
+
 		for _, namespace := range namespaces {
 			if imp.from.namespace.Contains(namespace) {
-				newImports = append(newImports, imp)
+				includeImport = true
 
-				continue
+				break
 			}
+		}
+
+		if includeImport {
+			newImports = append(newImports, imp)
 		}
 	}
 
@@ -262,12 +277,18 @@ func (g *Graph) includeChildComponentImports(namespaces Namespaces) Imports {
 	newImports := make(Imports, 0)
 
 	for _, imp := range g.Imports() {
+		includeImport := false
+
 		for _, namespace := range namespaces {
 			if imp.to.namespace.Contains(namespace) {
-				newImports = append(newImports, imp)
+				includeImport = true
 
-				continue
+				break
 			}
+		}
+
+		if includeImport {
+			newImports = append(newImports, imp)
 		}
 	}
 
@@ -284,7 +305,7 @@ func (g *Graph) ExcludeParentComponents(namespaces Namespaces) *Graph {
 			if imp.from.namespace.Contains(namespace) {
 				includeImport = false
 
-				continue
+				break
 			}
 		}
 
@@ -306,7 +327,7 @@ func (g *Graph) ExcludeChildComponents(namespaces Namespaces) *Graph {
 			if imp.to.namespace.Contains(namespace) {
 				includeImport = false
 
-				continue
+				break
 			}
 		}
 
@@ -382,7 +403,7 @@ func (g *Graph) String() string {
 	graphImports := g.Imports()
 
 	for i, imp := range graphImports {
-		sb.WriteString(imp.From().Namespace().String() + " -> " + imp.To().Namespace().String())
+		sb.WriteString(imp.String())
 
 		if i < len(graphImports)-1 {
 			sb.WriteRune('\n')
