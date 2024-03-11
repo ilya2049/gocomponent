@@ -100,19 +100,25 @@ gocomponent http --port=8080
 
 Напечатать идентификаторы компонентов и соответствующие им пространства имен
 
-```
+``` sh
 gocomponent ns
 ```
 
 Напечатать граф компонентов на языке dot
 
-```
+``` sh
 gocomponent dot
+
+# Записать в файл
+gocomponent dot > graph.dot
 ```
 
-Сохранить граф в .svg фал
+Сохранить граф в формате svg
 
-```
+``` sh
+gocomponent svg
+
+# Записать в файл
 gocomponent svg > graph.svg
 ```
 
