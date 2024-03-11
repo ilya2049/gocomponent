@@ -24,6 +24,10 @@ custom = [
     'user'
 ]
 
+only = [
+    'user'
+]
+
 [colors]
 'user' = 'blue'
 
