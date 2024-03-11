@@ -40,6 +40,11 @@ func newApp() *cli.App {
 				Action: printDotGraph,
 			},
 			{
+				Name:   "svg",
+				Usage:  "Print an svg file with a graph",
+				Action: printDotSVG,
+			},
+			{
 				Name:   "ns",
 				Usage:  "Print namespaces in the project",
 				Action: printNamespaces,
@@ -69,6 +74,19 @@ func printDotGraph(*cli.Context) error {
 	printer := cliapp.NewDotGraphPrinter(&dot.Exporter{}, os.Stdout)
 
 	return printer.PrintDotGraph(componentGraph)
+}
+
+func printDotSVG(*cli.Context) error {
+	componentGraphReader := &fs.ComponentGraphReader{}
+
+	componentGraph, err := componentGraphReader.ReadComponentGraph()
+	if err != nil {
+		return err
+	}
+
+	printer := cliapp.NewDotSVGPrinter(&dot.Exporter{}, os.Stdout)
+
+	return printer.PrintDotSVG(componentGraph)
 }
 
 func printNamespaces(*cli.Context) error {

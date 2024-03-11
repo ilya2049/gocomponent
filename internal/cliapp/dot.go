@@ -11,10 +11,6 @@ type dotExporter interface {
 	Export(*component.Graph) string
 }
 
-type dotSVGExporter interface {
-	ExportSVG(*component.Graph) ([]byte, error)
-}
-
 type DotGraphPrinter struct {
 	dotExporter dotExporter
 	destination io.Writer
