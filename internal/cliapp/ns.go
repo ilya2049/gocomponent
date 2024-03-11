@@ -21,10 +21,10 @@ func NewNamespacePrinter(destination io.Writer) *NamespacePrinter {
 func (p *NamespacePrinter) PrintNamespaces(componentGraph *component.Graph) error {
 	sb := strings.Builder{}
 
-	components := componentGraph.Components()
+	components := componentGraph.Components().OrderByStability()
 
 	for i, component := range components {
-		sb.WriteString(fmt.Sprintf("%s [%s] %.2f", component.Namespace(), component.ID(), component.Stability()))
+		sb.WriteString(fmt.Sprintf("%.2f %s [%s]", component.Stability(), component.Namespace(), component.ID()))
 
 		if i < len(components)-1 {
 			sb.WriteRune('\n')

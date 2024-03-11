@@ -1,6 +1,9 @@
 package component
 
-import "strings"
+import (
+	"slices"
+	"strings"
+)
 
 type Component struct {
 	namespace      Namespace
@@ -87,3 +90,16 @@ func (c *Component) Stability() float64 {
 }
 
 type Components []*Component
+
+func (components Components) OrderByStability() Components {
+	orderedComponents := make([]*Component, len(components))
+	copy(orderedComponents, components)
+
+	slices.SortFunc(orderedComponents, func(c1, c2 *Component) int {
+		diff := c1.Stability() - c2.Stability()
+
+		return int(diff * 100)
+	})
+
+	return orderedComponents
+}
