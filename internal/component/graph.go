@@ -151,6 +151,36 @@ func (g *Graph) MakeUniqueComponentIDs() {
 	}
 }
 
+func (g *Graph) CalculateStability() {
+	type componentImports struct {
+		component      *Component
+		fromImportsSum int
+		toImportSum    int
+	}
+
+	componentImportsMap := make(map[Namespace]*componentImports, 0)
+	for _, aComponent := range g.Components() {
+		componentImportsMap[aComponent.Namespace()] = &componentImports{
+			component: aComponent,
+		}
+	}
+
+	for _, imp := range g.Imports() {
+		fromComponentAndImports := componentImportsMap[imp.From().Namespace()]
+		fromComponentAndImports.fromImportsSum++
+
+		toComponentAndImports := componentImportsMap[imp.To().Namespace()]
+		toComponentAndImports.toImportSum++
+	}
+
+	for _, componentAndImports := range componentImportsMap {
+		from := float64(componentAndImports.fromImportsSum)
+		to := float64(componentAndImports.toImportSum)
+
+		componentAndImports.component.SetStability(from / (to + from))
+	}
+}
+
 func (g *Graph) NormalizeComponentSizes() {
 	const minNormalizeSize = 0.1
 

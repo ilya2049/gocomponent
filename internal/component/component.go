@@ -8,6 +8,7 @@ type Component struct {
 	color          Color
 	sizeBytes      int
 	normalizedSize float64
+	stability      float64
 }
 
 func New(namespace Namespace) *Component {
@@ -17,6 +18,7 @@ func New(namespace Namespace) *Component {
 		color:          "",
 		sizeBytes:      0,
 		normalizedSize: 0,
+		stability:      0,
 	}
 }
 
@@ -74,6 +76,14 @@ func (c *Component) NormalizedSize() float64 {
 
 func (c *Component) IsSizeNormalized() bool {
 	return c.normalizedSize > 0
+}
+
+func (c *Component) SetStability(stability float64) {
+	c.stability = stability
+}
+
+func (c *Component) Stability() float64 {
+	return c.stability
 }
 
 type Components []*Component

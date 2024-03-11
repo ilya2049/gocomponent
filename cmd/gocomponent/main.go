@@ -97,6 +97,8 @@ func printNamespaces(*cli.Context) error {
 		return err
 	}
 
+	componentGraph.CalculateStability()
+
 	printer := cliapp.NewNamespacePrinter(os.Stdout)
 
 	return printer.PrintNamespaces(componentGraph)
