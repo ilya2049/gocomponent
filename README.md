@@ -110,6 +110,12 @@ gocomponent ns
 gocomponent dot
 ```
 
+Сохранить граф в .svg фал
+
+```
+gocomponent svg > graph.svg
+```
+
 ## Примеры
 
 Все примеры структурированы следующим образом:
