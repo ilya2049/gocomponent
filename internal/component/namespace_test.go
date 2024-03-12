@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/ilya2049/gocomponent/internal/component"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -91,6 +90,40 @@ func TestNamespace_ExtendComponentID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equal(t, tt.want, tt.namespace.ExtendComponentID(tt.componentIDSections))
+		})
+	}
+}
+
+func TestNamespace_Contains(t *testing.T) {
+	tests := []struct {
+		name    string
+		ns      component.Namespace
+		another component.Namespace
+		want    bool
+	}{
+		{
+			name:    "Roll up",
+			ns:      "/internal/domain/user",
+			another: "/internal/domain",
+			want:    true,
+		},
+		{
+			name:    "Exactly",
+			ns:      "/internal/domain",
+			another: "/internal/domain.",
+			want:    true,
+		},
+		{
+			name:    "Marker section",
+			ns:      "/internal/domain/user",
+			another: "domain",
+			want:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.ns.Contains(tt.another), tt.want)
 		})
 	}
 }

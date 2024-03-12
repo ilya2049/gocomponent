@@ -1,6 +1,8 @@
 package component
 
-import "strings"
+import (
+	"strings"
+)
 
 const Slash = "/"
 
@@ -45,6 +47,12 @@ func (ns Namespace) ExtendComponentID(componentIDSections string) string {
 }
 
 func (ns Namespace) Contains(another Namespace) bool {
+	const dot = "."
+
+	if strings.HasSuffix(another.String(), dot) {
+		return ns.String() == strings.TrimSuffix(another.String(), dot)
+	}
+
 	if strings.HasPrefix(another.String(), Slash) {
 		return strings.HasPrefix(ns.String(), another.String())
 	}
